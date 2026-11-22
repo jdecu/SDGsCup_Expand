@@ -14,6 +14,7 @@ html,body{margin:0}
 body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:110px}
 h1,h2,h3,.disp{font-family:'Bricolage Grotesque',sans-serif;margin:0}
 header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:3px solid var(--gold);position:sticky;top:0;background:var(--bg);z-index:5}
+header .logo{height:38px;width:auto;display:block}
 header b{font-family:'Bricolage Grotesque';font-size:1.15rem;display:block}header small{color:var(--mute)}
 main{max-width:640px;margin:0 auto;padding:16px}
 .card{background:var(--card);border-radius:16px;padding:18px;margin-bottom:14px;border:1px solid var(--line)}
@@ -49,7 +50,7 @@ dialog::backdrop{background:#0008}
 </head>
 <body>
 <header>
-  <div><b>SDGs Cup</b><small>Expand Consulting</small></div>
+  <div class="row"><img src="logo.png" alt="Expand Consulting" class="logo" onerror="this.remove()"><div><b>SDGs Cup</b><small>Expand Consulting</small></div></div>
   <span class="mute" id="status" style="white-space:nowrap"></span>
 </header>
 <main id="app"></main>

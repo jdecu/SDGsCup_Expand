@@ -7,31 +7,31 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#EDF1F3;--card:#fff;--ink:#102A43;--mute:#627D98;--line:#D9E2EC;--gold:#FDB713;--green:#3F7E44;--easy:#3F7E44;--med:#C77700;--hard:#A4262C}
-@media(prefers-color-scheme:dark){:root{--bg:#0B1A29;--card:#14293D;--ink:#EAF0F6;--mute:#9FB3C8;--line:#243B53;--easy:#6CC070;--med:#FDB713;--hard:#FF8A8A}}
+:root{--bg:#F1F6F3;--card:#fff;--ink:#111;--mute:#5A6B61;--line:#D8E5DD;--gold:#008A5E;--dark:#0A5C1A;--onacc:#fff;--green:#008A5E}
+@media(prefers-color-scheme:dark){:root{--bg:#0B1612;--card:#12231B;--ink:#EAF3ED;--mute:#9DB5A8;--line:#24392E;--gold:#22B880;--onacc:#04150D}}
 *{box-sizing:border-box}
 html,body{margin:0}
 body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:110px}
 h1,h2,h3,.disp{font-family:'Bricolage Grotesque',sans-serif;margin:0}
-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:5}
+header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:3px solid var(--gold);position:sticky;top:0;background:var(--bg);z-index:5}
 header b{font-family:'Bricolage Grotesque';font-size:1.15rem;display:block}header small{color:var(--mute)}
 main{max-width:640px;margin:0 auto;padding:16px}
 .card{background:var(--card);border-radius:16px;padding:18px;margin-bottom:14px;border:1px solid var(--line)}
-.hero{background:var(--ink);color:#fff;border:0}
-.hero .big{font-family:'Bricolage Grotesque';font-weight:800;font-size:3.4rem;line-height:1;color:var(--gold)}
+.hero{background:var(--dark);color:#fff;border:0}
+.hero .big{font-family:'Bricolage Grotesque';font-weight:800;font-size:3.4rem;line-height:1;color:#9BE8C6}
 .hero p{margin:8px 0 0;opacity:.85}
 .row{display:flex;gap:10px;align-items:center}.sp{justify-content:space-between}
 .mute{color:var(--mute);font-size:.88rem}
-.sdg{min-width:34px;height:34px;border-radius:8px;background:var(--green);color:#fff;font:800 .95rem 'Bricolage Grotesque';display:grid;place-items:center}
+.sdg{min-width:34px;height:34px;border-radius:8px;background:var(--green);color:var(--onacc);font:800 .95rem 'Bricolage Grotesque';display:grid;place-items:center}
 .tag{font-size:.75rem;font-weight:700;padding:2px 9px;border-radius:99px;border:1.5px solid currentColor}
-.Facile{color:var(--easy)}.Moyen{color:var(--med)}.Difficile{color:var(--hard)}
+
 .pts{font:800 1.1rem 'Bricolage Grotesque';white-space:nowrap}
 nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;padding:6px 0 10px;z-index:6}
 nav div{display:flex;width:100%;max-width:640px;justify-content:space-around;align-items:end}
 nav button{background:none;border:0;color:var(--mute);font:600 .75rem 'DM Sans';padding:8px 10px;cursor:pointer}
-nav button.on{color:var(--ink);border-bottom:3px solid var(--gold)}
-nav .fab{width:58px;height:58px;border-radius:50%;background:var(--gold);color:var(--ink);font-size:2rem;line-height:1;margin-top:-26px;box-shadow:0 6px 16px #0003;border:0;padding:0}
-button.p{background:var(--ink);color:var(--bg);border:0;border-radius:10px;padding:10px 16px;font:700 .95rem 'DM Sans';cursor:pointer}
+nav button.on{color:var(--gold);border-bottom:3px solid var(--gold)}
+nav .fab{width:58px;height:58px;border-radius:50%;background:var(--gold);color:var(--onacc);font-size:2rem;line-height:1;margin-top:-26px;box-shadow:0 6px 16px #0003;border:0;padding:0}
+button.p{background:var(--gold);color:var(--onacc);border:0;border-radius:10px;padding:10px 16px;font:700 .95rem 'DM Sans';cursor:pointer}
 button.g{background:none;border:1.5px solid var(--line);color:var(--ink);border-radius:10px;padding:8px 12px;font:600 .85rem 'DM Sans';cursor:pointer}
 :focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 input,select,textarea{width:100%;padding:11px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:inherit;margin:4px 0 12px}
@@ -46,7 +46,7 @@ dialog::backdrop{background:#0008}
 </head>
 <body>
 <header>
-  <div><b>SDGs Cup</b><small>Expand Consulting</small></div>
+  <div><b>SDGs Cup</b><small>Expand Consulting · Made by Students for Companies</small></div>
   <span class="mute" id="status"></span>
 </header>
 <main id="app"></main>
@@ -63,18 +63,63 @@ dialog::backdrop{background:#0008}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script>
 /* ============ CONFIGURATION (à modifier) ============ */
+const c = (id,grp,sdg,pts,t,rep=false) => ({id,grp,sdg,pts,t,rep});
 const CONFIG = {
   start: "2026-11-23",                 // date de lancement
   adminPin: "1234",                    // PIN pour supprimer des posts (à changer !)
-  teams: ["Équipe Bleue", "Équipe Verte", "Équipe Jaune", "Équipe Rouge"],
-  points: { Facile: 10, Moyen: 25, Difficile: 50 },
-  challenges: [                        // sdg = n° de l'ODD concerné
-    { id: "c1", t: "Apporter sa gourde au bureau pendant 3 jours", sdg: 12, lvl: "Facile" },
-    { id: "c2", t: "Venir à vélo ou à pied à l'école/au bureau", sdg: 11, lvl: "Facile" },
-    { id: "c3", t: "Repas 100 % végétarien pendant 2 jours", sdg: 13, lvl: "Moyen" },
-    { id: "c4", t: "Organiser une collecte de vêtements", sdg: 12, lvl: "Moyen" },
-    { id: "c5", t: "Ramasser 5 kg de déchets (photo à l'appui)", sdg: 14, lvl: "Difficile" },
-    { id: "c6", t: "Faire un atelier de sensibilisation aux ODD", sdg: 4, lvl: "Difficile" }
+  teams: ["CxO", "HR", "CU", "SSU", "STU", "QU", "CommU"],
+  /* Défis : c(id, groupe, n° ODD, points, texte, répétable?) */
+  challenges: [
+    c("o1","Défis ODD",1,10,"Grand tri de vêtements/objets et dépôt dans une association"),
+    c("o2a","Défis ODD",2,10,"Zéro gaspillage : moins de sacs poubelle ou invendus de l'AlimentaKot"),
+    c("o2b","Défis ODD",2,10,"100 % de saison : produits de saison uniquement"),
+    c("o2c","Défis ODD",2,15,"Repas solidaire : préparer et donner un repas à un sans-abri"),
+    c("o3a","Défis ODD",3,5,"Gratitude : noter 3 choses positives de la journée"),
+    c("o3b","Défis ODD",3,5,"Cuisine maison saine"),
+    c("o3c","Défis ODD",3,10,"10 000 pas dans la journée"),
+    c("o3d","Défis ODD",3,10,"Activité physique avec Expand (canal #sport)"),
+    c("o3e","Défis ODD",3,5,"30 min d'activité physique (nage, course, fitness…)"),
+    c("o4a","Défis ODD",4,15,"Session de coworking ou monitorat"),
+    c("o4b","Défis ODD",4,15,"Table de discussion : organiser un débat"),
+    c("o7a","Défis ODD",7,5,"Trajet en bus ou en train",true),
+    c("o7b","Défis ODD",7,10,"Trajet à vélo, roller, trottinette…",true),
+    c("o7c","Défis ODD",7,10,"Réduction d'énergie : chargeurs débranchés, lumières éteintes…"),
+    c("o7d","Défis ODD",7,1,"Appareils laissés à l'entrée du réu all (bloc-notes !)"),
+    c("o7e","Défis ODD",7,1,"Faire le tri sur son tel : photos, mails, apps…"),
+    c("o8a","Défis ODD",8,1,"+1 par 2 € dépensés dans un magasin local/durable/éthique (indique le nombre de points)",true),
+    c("o8b","Défis ODD",8,10,"Networking : nouveaux contacts"),
+    c("o10a","Défis ODD",10,15,"Demander son avis à quelqu'un de « différent » et l'écouter sans contredire"),
+    c("o10b","Défis ODD",10,15,"Défendre une personne en situation de minorité"),
+    c("o10c","Défis ODD",10,10,"Participer à un event de KAP solidaire ou inclusif"),
+    c("o11a","Défis ODD",11,10,"Proposer un covoiturage à quelqu'un qui en a besoin"),
+    c("o11b","Défis ODD",11,15,"Aider une personne à mobilité réduite à se déplacer"),
+    c("o11c","Défis ODD",11,20,"Zéro voiture pendant 1 semaine"),
+    c("o12a","Défis ODD",12,20,"Max une poubelle de 30 L dans le kot sur la semaine"),
+    c("o12b","Défis ODD",12,10,"Expliquer le développement durable à un pote"),
+    c("o12c","Défis ODD",12,20,"Une semaine 100 % vrac et végé"),
+    c("o12d","Défis ODD",12,15,"Cuisiner soi-même pendant 1 semaine"),
+    c("o12e","Défis ODD",12,10,"Éviter les fastfoods (Mcdo, kebab…)"),
+    c("o13a","Défis ODD",13,10,"Utiliser principalement les transports en commun"),
+    c("o13b","Défis ODD",13,10,"Moins de viande, manger bio/local (färm)"),
+    c("o13c","Défis ODD",13,15,"Initiative locale : event KAP, atelier MDD, conférence JCL…"),
+    c("o14","Défis ODD",14,10,"Éviter les produits de la mer"),
+    c("o15a","Défis ODD",15,20,"Ramassage de déchets autour du lac ou du parc de la Source"),
+    c("o15b","Défis ODD",15,2,"Bonus photo : canette de Cara, capote, capsule ou mégot",true),
+    c("l1","CEMS · Lundi",17,5,"Passer son navigateur sur Ecosia"),
+    c("l2","CEMS · Lundi",17,10,"Cuisiner et manger un repas végétarien"),
+    c("l3","CEMS · Lundi",17,15,"Donner son sang avant vendredi"),
+    c("m1","CEMS · Mardi",17,5,"Marcher 10 000 pas dans la journée"),
+    c("m2","CEMS · Mardi",17,10,"Convaincre ses amis des vertus de l'éco-responsabilité (speech)"),
+    c("m3","CEMS · Mardi",17,15,"Réparer quelque chose au lieu de le remplacer"),
+    c("w1","CEMS · Mercredi",17,5,"Apporter son lunch dans un contenant réutilisable"),
+    c("w2","CEMS · Mercredi",17,10,"Donner des vêtements"),
+    c("w3","CEMS · Mercredi",17,15,"Courses chez färm ou dans un magasin durable"),
+    c("j1","CEMS · Jeudi",17,5,"Manger au RestU"),
+    c("j2","CEMS · Jeudi",17,10,"Écrire deux éco-résolutions pour l'année"),
+    c("j3","CEMS · Jeudi",17,15,"Pas plus d'1 h de téléphone dans la journée"),
+    c("v1","CEMS · Vendredi",17,5,"Supprimer tous ses spams"),
+    c("v2","CEMS · Vendredi",17,10,"Prendre les transports en commun"),
+    c("v3","CEMS · Vendredi",17,15,"Une journée sans rien acheter emballé dans du plastique")
   ],
   /* Mode temps réel : colle ici ta config Firebase (Realtime Database).
      Laisse null pour tester en mode démo (stockage local, non partagé). */
@@ -112,7 +157,7 @@ const Store = (() => {
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const ch = id => CONFIG.challenges.find(c => c.id === id);
-const pts = p => CONFIG.points[ch(p.cid)?.lvl] || 0;
+const pts = p => { const x = ch(p.cid); return x ? x.pts * (x.id==='o8a' ? Math.max(1, +p.qty||1) : 1) : 0; };
 let posts = [], tab = "feed", admin = false;
 let me = (() => { try { return JSON.parse(localStorage.getItem("sdgcup_me")) || {}; } catch { return {}; } })();
 const saveMe = () => { try { localStorage.setItem("sdgcup_me", JSON.stringify(me)); } catch {} };
@@ -125,9 +170,9 @@ function vFeed(){
   const hero = `<div class="card hero"><div class="mute" style="color:#fff9">${d>0?"Démarrage dans":"Compétition en cours"}</div>
     <div class="big">${d>0?d+" jour"+(d>1?"s":""):"C'est parti !"}</div>
     <p>Relève les défis, poste ta preuve : ton équipe marque des points immédiatement.</p></div>`;
-  const list = posts.length ? posts.map(p => { const c = ch(p.cid) || {t:"Défi supprimé",sdg:"?",lvl:"Facile"};
+  const list = posts.length ? posts.map(p => { const c = ch(p.cid) || {t:"Défi supprimé",sdg:"?"};
     return `<div class="card"><div class="row sp"><div class="row"><div class="sdg">${esc(c.sdg)}</div><div><b>${esc(p.member)}</b> <span class="mute">· ${esc(p.team)}</span><div class="mute">${ago(p.ts)}</div></div></div><div class="pts">+${pts(p)}</div></div>
-    <p style="margin:12px 0 6px"><b>${esc(c.t)}</b> <span class="tag ${c.lvl}">${c.lvl}</span></p>
+    <p style="margin:12px 0 6px"><b>${esc(c.t)}</b> <span class="mute">· ODD ${esc(c.sdg)}</span></p>
     ${p.note?`<p style="margin:6px 0">${esc(p.note)}</p>`:""}
     ${/^https?:\/\//.test(p.link||"")?`<a href="${esc(p.link)}" target="_blank" rel="noopener">Voir la preuve</a>`:""}
     ${admin?`<div style="margin-top:8px"><button class="g" data-del="${esc(p.id)}">Supprimer</button></div>`:""}</div>`; }).join("")
@@ -141,9 +186,10 @@ function vRank(){
     <div class="bar"><i style="width:${x.p/max*100}%"></i></div></div></div></div>`).join("");
 }
 function vChal(){
-  return `<h2 style="margin:6px 4px 12px">Les défis</h2>` + ["Facile","Moyen","Difficile"].map(l =>
-    `<h3 class="${l}" style="margin:16px 4px 8px">${l} · ${CONFIG.points[l]} pts</h3>` + CONFIG.challenges.filter(c => c.lvl === l).map(c =>
-    `<div class="card row"><div class="sdg">${c.sdg}</div><div>${esc(c.t)}<div class="mute">ODD ${c.sdg}</div></div></div>`).join("")).join("");
+  const groups = [...new Set(CONFIG.challenges.map(x => x.grp))];
+  return `<h2 style="margin:6px 4px 12px">Les défis</h2>` + groups.map(g =>
+    `<h3 style="margin:18px 4px 8px">${esc(g)}</h3>` + CONFIG.challenges.filter(x => x.grp === g).map(x =>
+    `<div class="card row sp"><div class="row"><div class="sdg">${x.sdg}</div><div>${esc(x.t)}${x.rep?`<div class="mute">Répétable</div>`:""}</div></div><div class="pts">+${x.pts}</div></div>`).join("")).join("");
 }
 function vMe(){
   const mine = posts.filter(p => p.member === me.name && p.team === me.team);
@@ -173,17 +219,19 @@ function openForm(){
   dlg.innerHTML = `<h2 style="margin-bottom:14px">Déclarer un défi</h2>
   <label>Prénom</label><input id="fn" value="${esc(me.name||"")}">
   <label>Équipe</label><select id="ft">${CONFIG.teams.map(t=>`<option ${me.team===t?"selected":""}>${esc(t)}</option>`).join("")}</select>
-  <label>Défi relevé</label><select id="fc">${CONFIG.challenges.map(c=>`<option value="${c.id}">[${c.lvl}] ${esc(c.t)}</option>`).join("")}</select>
+  <label>Défi relevé</label><select id="fc">${[...new Set(CONFIG.challenges.map(x=>x.grp))].map(g=>`<optgroup label="${esc(g)}">${CONFIG.challenges.filter(x=>x.grp===g).map(x=>`<option value="${x.id}">+${x.pts} · ${esc(x.t)}</option>`).join("")}</optgroup>`).join("")}</select>
+  <div id="fq" hidden><label>Nombre de tranches de 2 €</label><input id="fqn" type="number" min="1" value="1"></div>
   <label>Commentaire (optionnel)</label><textarea id="fo" rows="2"></textarea>
   <label>Lien vers la preuve (photo, Drive, Insta…)</label><input id="fl" type="url" placeholder="https://">
   <div class="row sp"><button class="g" id="fx">Annuler</button><button class="p" id="fs">Publier</button></div>`;
   dlg.showModal();
+  $("#fc").onchange = () => { $("#fq").hidden = $("#fc").value !== "o8a"; };
   $("#fx").onclick = () => dlg.close();
   $("#fs").onclick = async () => {
     const member = $("#fn").value.trim(), team = $("#ft").value, cid = $("#fc").value;
     if (!member) return alert("Indique ton prénom.");
-    if (posts.some(p => p.member.toLowerCase() === member.toLowerCase() && p.team === team && p.cid === cid)) return alert("Tu as déjà validé ce défi.");
-    await Store.add({ member, team, cid, note: $("#fo").value.trim().slice(0,300), link: $("#fl").value.trim(), ts: Date.now() });
+    if (!ch(cid).rep && posts.some(p => p.member.toLowerCase() === member.toLowerCase() && p.team === team && p.cid === cid)) return alert("Tu as déjà validé ce défi.");
+    await Store.add({ member, team, cid, qty: +$("#fqn").value||1, note: $("#fo").value.trim().slice(0,300), link: $("#fl").value.trim(), ts: Date.now() });
     me = { name: member, team }; saveMe(); dlg.close(); tab = "feed"; render();
   };
 }

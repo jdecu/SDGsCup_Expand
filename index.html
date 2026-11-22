@@ -51,11 +51,13 @@ dialog::backdrop{background:#0008}
 </header>
 <main id="app"></main>
 <nav><div>
-  <button data-t="feed">Feed</button>
+  <button data-t="feed">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg><span>Feed</span>
+  </button>
   <button data-t="rank">Classement</button>
   <button class="fab" id="add" aria-label="Déclarer un défi">+</button>
-  <button data-t="chal">Défis</button>
-  <button data-t="me">Mon profil</button>
+  <button data-t="chal"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span>Défis</span></button>
+  <button data-t="me"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Mon profil</span></button>
 </div></nav>
 <dialog id="dlg"></dialog>
 

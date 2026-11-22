@@ -3,168 +3,192 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kappourse - RELOADED/RESURECTION</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏠</text></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<title>SDGs Cup – Expand Consulting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#1f3a34;--paper:#f3ecdf;--ink:#1c2b27;--accent:#e9a03b;--muted:#5d6b66}
+:root{--bg:#EDF1F3;--card:#fff;--ink:#102A43;--mute:#627D98;--line:#D9E2EC;--gold:#FDB713;--green:#3F7E44;--easy:#3F7E44;--med:#C77700;--hard:#A4262C}
+@media(prefers-color-scheme:dark){:root{--bg:#0B1A29;--card:#14293D;--ink:#EAF0F6;--mute:#9FB3C8;--line:#243B53;--easy:#6CC070;--med:#FDB713;--hard:#FF8A8A}}
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--bg);color:var(--paper);font-family:'DM Sans',system-ui,sans-serif;line-height:1.55}
-.wrap{max-width:640px;margin:0 auto;padding:48px 22px 64px}
-h1{font-family:'Fraunces',Georgia,serif;font-weight:800;font-size:clamp(2.4rem,9vw,4rem);line-height:1.02;margin:0 0 24px}
-.card{background:var(--paper);color:var(--ink);border-radius:18px;padding:26px;margin-bottom:22px}
-.card h2{font-family:'Fraunces',Georgia,serif;font-size:1.35rem;margin:0 0 14px}
-dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:10px 18px}
-dt{font-weight:700}dd{margin:0}
-a{color:inherit}
-.btn{display:inline-block;border:0;cursor:pointer;font:inherit;font-weight:700;background:var(--accent);color:#2a1c05;padding:13px 22px;border-radius:999px;text-decoration:none}
-.btn.ghost{background:transparent;border:2px solid var(--ink);color:var(--ink)}
-.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #1b6ef3;outline-offset:2px}
-label{display:block;font-weight:500;margin:14px 0 6px}
-input,select,textarea{width:100%;font:inherit;padding:11px 12px;border-radius:10px;border:1.5px solid #b9b19f;background:#fff;color:var(--ink)}
-.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
-#form{height:720px;background:#fff}
-.note{color:var(--muted);font-size:.9rem;margin-top:12px}
-iframe{width:100%;height:240px;border:0;border-radius:12px;margin-top:16px}
-.photo-wall{height:500px;}
-/* Styles du compte à rebours */
-.countdown-container { display: flex; justify-content: center; gap: 15px; font-size: 2rem; font-weight: 800; color: var(--accent); margin-top: 10px; }
-.cd-box { display: flex; flex-direction: column; align-items: center; min-width: 60px; }
-.cd-label { font-size: 0.85rem; color: var(--muted); font-weight: 700; text-transform: uppercase; margin-top: -5px; }
-.cd-sep { color: var(--muted); font-weight: 400; }
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:110px}
+h1,h2,h3,.disp{font-family:'Bricolage Grotesque',sans-serif;margin:0}
+header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:5}
+header b{font-family:'Bricolage Grotesque';font-size:1.15rem;display:block}header small{color:var(--mute)}
+main{max-width:640px;margin:0 auto;padding:16px}
+.card{background:var(--card);border-radius:16px;padding:18px;margin-bottom:14px;border:1px solid var(--line)}
+.hero{background:var(--ink);color:#fff;border:0}
+.hero .big{font-family:'Bricolage Grotesque';font-weight:800;font-size:3.4rem;line-height:1;color:var(--gold)}
+.hero p{margin:8px 0 0;opacity:.85}
+.row{display:flex;gap:10px;align-items:center}.sp{justify-content:space-between}
+.mute{color:var(--mute);font-size:.88rem}
+.sdg{min-width:34px;height:34px;border-radius:8px;background:var(--green);color:#fff;font:800 .95rem 'Bricolage Grotesque';display:grid;place-items:center}
+.tag{font-size:.75rem;font-weight:700;padding:2px 9px;border-radius:99px;border:1.5px solid currentColor}
+.Facile{color:var(--easy)}.Moyen{color:var(--med)}.Difficile{color:var(--hard)}
+.pts{font:800 1.1rem 'Bricolage Grotesque';white-space:nowrap}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;padding:6px 0 10px;z-index:6}
+nav div{display:flex;width:100%;max-width:640px;justify-content:space-around;align-items:end}
+nav button{background:none;border:0;color:var(--mute);font:600 .75rem 'DM Sans';padding:8px 10px;cursor:pointer}
+nav button.on{color:var(--ink);border-bottom:3px solid var(--gold)}
+nav .fab{width:58px;height:58px;border-radius:50%;background:var(--gold);color:var(--ink);font-size:2rem;line-height:1;margin-top:-26px;box-shadow:0 6px 16px #0003;border:0;padding:0}
+button.p{background:var(--ink);color:var(--bg);border:0;border-radius:10px;padding:10px 16px;font:700 .95rem 'DM Sans';cursor:pointer}
+button.g{background:none;border:1.5px solid var(--line);color:var(--ink);border-radius:10px;padding:8px 12px;font:600 .85rem 'DM Sans';cursor:pointer}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+input,select,textarea{width:100%;padding:11px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:inherit;margin:4px 0 12px}
+label{font-weight:700;font-size:.88rem}
+dialog{border:0;border-radius:18px;padding:22px;width:min(92vw,440px);background:var(--card);color:var(--ink)}
+dialog::backdrop{background:#0008}
+.rank{display:flex;align-items:center;gap:12px}
+.pos{font:800 1.6rem 'Bricolage Grotesque';width:34px;text-align:center}
+.bar{height:8px;border-radius:9px;background:var(--line);overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:var(--gold)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--mute);margin-right:6px}.dot.live{background:#2ECC71}
 </style>
 </head>
 <body>
-<main class="wrap">
-  <h1 id="titre"></h1>
-  
-  <!-- PHOTO -->
-  <div style="text-align: center; margin-bottom: 24px;">
-    <img src="affiche.jpeg" alt="Affiche Kappourse" style="max-width: 100%; border-radius: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
-  </div>
+<header>
+  <div><b>SDGs Cup</b><small>Expand Consulting</small></div>
+  <span class="mute" id="status"></span>
+</header>
+<main id="app"></main>
+<nav><div>
+  <button data-t="feed">Feed</button>
+  <button data-t="rank">Classement</button>
+  <button class="fab" id="add" aria-label="Déclarer un défi">+</button>
+  <button data-t="chal">Défis</button>
+  <button data-t="me">Mon profil</button>
+</div></nav>
+<dialog id="dlg"></dialog>
 
-  <!-- COMPTE À REBOURS -->
-  <section class="card" style="text-align: center;">
-    <h2>Début des hostilités dans :</h2>
-    <div id="countdown" class="countdown-container">
-      <div class="cd-box"><span id="cd-days">00</span><span class="cd-label">Jours</span></div>
-      <div class="cd-sep">:</div>
-      <div class="cd-box"><span id="cd-hours">00</span><span class="cd-label">Heures</span></div>
-      <div class="cd-sep">:</div>
-      <div class="cd-box"><span id="cd-minutes">00</span><span class="cd-label">Min</span></div>
-      <div class="cd-sep">:</div>
-      <div class="cd-box"><span id="cd-seconds">00</span><span class="cd-label">Sec</span></div>
-    </div>
-  </section>
-
-  <section class="card">
-    <h2>Infos pratiques</h2>
-    <dl>
-      <dt>Date</dt><dd id="date"></dd>
-      <dt>Heure</dt><dd id="heure"></dd>
-      <dt>Adresse</dt><dd id="adresse"></dd>
-      <dt>Lieu / accès</dt><dd id="acces"></dd>
-      <dt>Apporter</dt><dd id="apporter"></dd>
-    </dl>
-    <iframe id="map" title="Carte" loading="lazy"></iframe>
-    <div class="row">
-      <a class="btn ghost" id="itineraire" target="_blank" rel="noopener">Itinéraire</a>
-      <a class="btn ghost" id="agenda">Ajouter à l'agenda</a>
-    </div>
-  </section>
-
-  <section class="card">
-    <h2>Tu viens ?</h2>
-    <p style="margin-top:0">Réponds avant le <strong id="deadline"></strong>.</p>
-    <iframe id="form" title="Formulaire de réponse" loading="lazy"></iframe>
-    <div class="row">
-      <a class="btn" id="formLink" target="_blank" rel="noopener">Ouvrir le formulaire</a>
-    </div>
-  </section>
-
-  <!-- NOUVELLE SECTION : ALBUM PHOTO -->
-  <section class="card">
-    <h2>Photos</h2>
-    <p style="margin-top:0">Partagez vos meilleures photos de la soirée !</p>
-    <iframe id="photos" class="photo-wall" title="Mur de photos" loading="lazy" allow="camera;microphone;geolocation"></iframe>
-  </section>
-
-</main>
-
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script>
-/* ============ CONFIGURATION ============ */
+/* ============ CONFIGURATION (à modifier) ============ */
 const CONFIG = {
-  titre: "Kappourse - RELOADED/RESURECTION",
-  date: "Mardi 13 octobre 2026",
-  dateISO: "20261013",            // AAAAMMJJ
-  heureDebut: "1900",              // HHMM 
-  heureFin: "2300",
-  heure: "À partir de 19h",        
-  adresse: "Grand Rue 25b 308",
-  acces: "Kappourse",
-  apporter: "Votre cuve perso",
-  deadline: "8 octobre",
-  formEmbed: "https://docs.google.com/forms/d/e/1FAIpQLSc9mnXwB_2EruUzpghb9V3ZBXk3BrWepzhYR5JFCsGkAe4bHQ/viewform?embedded=true",
-  
-  // RAPPEL : Remplace ceci par ton vrai lien d'intégration Padlet !
-  padletEmbed: "https://padlet.com/jean50/photo-kappourse-s0241bfsph9jr090r4oo"
+  start: "2026-11-23",                 // date de lancement
+  adminPin: "1234",                    // PIN pour supprimer des posts (à changer !)
+  teams: ["Équipe Bleue", "Équipe Verte", "Équipe Jaune", "Équipe Rouge"],
+  points: { Facile: 10, Moyen: 25, Difficile: 50 },
+  challenges: [                        // sdg = n° de l'ODD concerné
+    { id: "c1", t: "Apporter sa gourde au bureau pendant 3 jours", sdg: 12, lvl: "Facile" },
+    { id: "c2", t: "Venir à vélo ou à pied à l'école/au bureau", sdg: 11, lvl: "Facile" },
+    { id: "c3", t: "Repas 100 % végétarien pendant 2 jours", sdg: 13, lvl: "Moyen" },
+    { id: "c4", t: "Organiser une collecte de vêtements", sdg: 12, lvl: "Moyen" },
+    { id: "c5", t: "Ramasser 5 kg de déchets (photo à l'appui)", sdg: 14, lvl: "Difficile" },
+    { id: "c6", t: "Faire un atelier de sensibilisation aux ODD", sdg: 4, lvl: "Difficile" }
+  ],
+  /* Mode temps réel : colle ici ta config Firebase (Realtime Database).
+     Laisse null pour tester en mode démo (stockage local, non partagé). */
+  firebase: null
+  /* ex: { apiKey:"...", authDomain:"...", databaseURL:"https://xxx-default-rtdb.europe-west1.firebasedatabase.app", projectId:"..." } */
 };
-/* ===================================== */
 
-const $ = id => document.getElementById(id);
-document.title = CONFIG.titre;
-$("titre").textContent = CONFIG.titre;
-$("date").textContent = CONFIG.date;
-$("heure").textContent = CONFIG.heure;
-$("adresse").textContent = CONFIG.adresse;
-$("acces").textContent = CONFIG.acces;
-$("apporter").textContent = CONFIG.apporter;
-$("deadline").textContent = CONFIG.deadline;
-
-// Google Maps
-const q = encodeURIComponent("Kappourse, " + CONFIG.adresse);
-$("map").src = "https://www.google.com/maps?q=" + q + "&output=embed";
-$("itineraire").href = "https://www.google.com/maps/dir/?api=1&destination=" + q;
-
-// Agenda
-$("agenda").href = "data:text/calendar;charset=utf-8," + encodeURIComponent(
-  "BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:" + CONFIG.titre +
-  "\nDTSTART:" + CONFIG.dateISO + "T" + CONFIG.heureDebut + "00\nDTEND:" + CONFIG.dateISO + "T" + CONFIG.heureFin +
-  "00\nLOCATION: Kappourse, " + CONFIG.adresse + "\nEND:VEVENT\nEND:VCALENDAR");
-$("agenda").download = "kappourse.ics";
-
-// Formulaire
-$("form").src = CONFIG.formEmbed;
-$("formLink").href = CONFIG.formEmbed.replace("?embedded=true", "");
-
-// Mur de photos (Padlet)
-$("photos").src = CONFIG.padletEmbed;
-
-// Logiciel du compte à rebours
-const countDownDate = new Date("2026-10-13T19:00:00").getTime();
-const x = setInterval(function() {
-  const now = new Date().getTime();
-  const distance = countDownDate - now;
-
-  // Calculs du temps
-  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-  const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-  // Affichage avec des zéros devant si < 10 (ex: 09 au lieu de 9)
-  $("cd-days").textContent = days.toString().padStart(2, '0');
-  $("cd-hours").textContent = hours.toString().padStart(2, '0');
-  $("cd-minutes").textContent = minutes.toString().padStart(2, '0');
-  $("cd-seconds").textContent = seconds.toString().padStart(2, '0');
-
-  // Si le compte à rebours est terminé
-  if (distance < 0) {
-    clearInterval(x);
-    $("countdown").innerHTML = "C'est l'heure ! 🍻";
+/* ============ COUCHE DONNÉES ============ */
+const Store = (() => {
+  if (CONFIG.firebase) {
+    firebase.initializeApp(CONFIG.firebase);
+    const ref = firebase.database().ref("posts");
+    return {
+      live: true,
+      sub(cb){ ref.on("value", s => { const v = s.val() || {}; cb(Object.entries(v).map(([id,p]) => ({...p, id})).sort((a,b)=>b.ts-a.ts)); }); },
+      add(p){ return ref.push(p); },
+      del(id){ return ref.child(id).remove(); }
+    };
   }
-}, 1000);
+  const K = "sdgcup_posts";
+  const load = () => { try { return JSON.parse(localStorage.getItem(K)) || []; } catch { return []; } };
+  const save = a => { try { localStorage.setItem(K, JSON.stringify(a)); } catch {} };
+  let cb = () => {};
+  const emit = () => cb(load().sort((a,b)=>b.ts-a.ts));
+  addEventListener("storage", emit);
+  return {
+    live: false,
+    sub(f){ cb = f; emit(); },
+    add(p){ const a = load(); a.push({...p, id: "p" + Date.now()}); save(a); emit(); },
+    del(id){ save(load().filter(p => p.id !== id)); emit(); }
+  };
+})();
+
+/* ============ ÉTAT ============ */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const ch = id => CONFIG.challenges.find(c => c.id === id);
+const pts = p => CONFIG.points[ch(p.cid)?.lvl] || 0;
+let posts = [], tab = "feed", admin = false;
+let me = (() => { try { return JSON.parse(localStorage.getItem("sdgcup_me")) || {}; } catch { return {}; } })();
+const saveMe = () => { try { localStorage.setItem("sdgcup_me", JSON.stringify(me)); } catch {} };
+const ago = t => { const m = Math.round((Date.now()-t)/60000); return m<1?"à l'instant":m<60?`il y a ${m} min`:m<1440?`il y a ${Math.round(m/60)} h`:`il y a ${Math.round(m/1440)} j`; };
+const scores = () => CONFIG.teams.map(t => ({ t, p: posts.filter(x => x.team === t).reduce((s,x) => s + pts(x), 0), n: posts.filter(x => x.team === t).length })).sort((a,b) => b.p - a.p);
+
+/* ============ VUES ============ */
+function vFeed(){
+  const d = Math.ceil((new Date(CONFIG.start) - new Date().setHours(0,0,0,0)) / 864e5);
+  const hero = `<div class="card hero"><div class="mute" style="color:#fff9">${d>0?"Démarrage dans":"Compétition en cours"}</div>
+    <div class="big">${d>0?d+" jour"+(d>1?"s":""):"C'est parti !"}</div>
+    <p>Relève les défis, poste ta preuve : ton équipe marque des points immédiatement.</p></div>`;
+  const list = posts.length ? posts.map(p => { const c = ch(p.cid) || {t:"Défi supprimé",sdg:"?",lvl:"Facile"};
+    return `<div class="card"><div class="row sp"><div class="row"><div class="sdg">${esc(c.sdg)}</div><div><b>${esc(p.member)}</b> <span class="mute">· ${esc(p.team)}</span><div class="mute">${ago(p.ts)}</div></div></div><div class="pts">+${pts(p)}</div></div>
+    <p style="margin:12px 0 6px"><b>${esc(c.t)}</b> <span class="tag ${c.lvl}">${c.lvl}</span></p>
+    ${p.note?`<p style="margin:6px 0">${esc(p.note)}</p>`:""}
+    ${/^https?:\/\//.test(p.link||"")?`<a href="${esc(p.link)}" target="_blank" rel="noopener">Voir la preuve</a>`:""}
+    ${admin?`<div style="margin-top:8px"><button class="g" data-del="${esc(p.id)}">Supprimer</button></div>`:""}</div>`; }).join("")
+    : `<div class="card" style="text-align:center"><h3>Rien pour l'instant</h3><p class="mute">Sois la première équipe au classement : appuie sur +.</p></div>`;
+  return hero + `<div class="row sp" style="margin:6px 4px 10px"><h2>Le feed</h2><span class="mute">${posts.length} post${posts.length>1?"s":""}</span></div>` + list;
+}
+function vRank(){
+  const s = scores(), max = Math.max(1, s[0]?.p);
+  return `<h2 style="margin:6px 4px 12px">Classement</h2>` + s.map((x,i) => `<div class="card"><div class="rank"><div class="pos">${i+1}</div>
+    <div style="flex:1"><div class="row sp"><b>${esc(x.t)}</b><span class="pts">${x.p} pts</span></div><div class="mute">${x.n} défi${x.n>1?"s":""} validé${x.n>1?"s":""}</div>
+    <div class="bar"><i style="width:${x.p/max*100}%"></i></div></div></div></div>`).join("");
+}
+function vChal(){
+  return `<h2 style="margin:6px 4px 12px">Les défis</h2>` + ["Facile","Moyen","Difficile"].map(l =>
+    `<h3 class="${l}" style="margin:16px 4px 8px">${l} · ${CONFIG.points[l]} pts</h3>` + CONFIG.challenges.filter(c => c.lvl === l).map(c =>
+    `<div class="card row"><div class="sdg">${c.sdg}</div><div>${esc(c.t)}<div class="mute">ODD ${c.sdg}</div></div></div>`).join("")).join("");
+}
+function vMe(){
+  const mine = posts.filter(p => p.member === me.name && p.team === me.team);
+  return `<h2 style="margin:6px 4px 12px">Mon profil</h2><div class="card">
+    <label>Mon prénom</label><input id="mn" value="${esc(me.name||"")}" placeholder="Ex : Camille">
+    <label>Mon équipe</label><select id="mt"><option value="">Choisir…</option>${CONFIG.teams.map(t=>`<option ${me.team===t?"selected":""}>${esc(t)}</option>`).join("")}</select>
+    <button class="p" id="sv">Enregistrer</button></div>
+    ${me.name?`<div class="card"><b>${mine.length} défi${mine.length>1?"s":""} validé${mine.length>1?"s":""}</b> · ${mine.reduce((s,p)=>s+pts(p),0)} pts</div>`:""}
+    <div class="card"><label>Mode organisateur</label>${admin?`<p class="mute">Activé : tu peux supprimer des posts depuis le feed.</p>`:`<input id="pin" type="password" placeholder="PIN"><button class="g" id="ad">Activer</button>`}</div>`;
+}
+function render(){
+  $("#app").innerHTML = ({feed:vFeed,rank:vRank,chal:vChal,me:vMe})[tab]();
+  document.querySelectorAll("nav [data-t]").forEach(b => b.classList.toggle("on", b.dataset.t === tab));
+  $("#status").innerHTML = `<span class="dot ${Store.live?"live":""}"></span>${Store.live?"Temps réel":"Mode démo"}`;
+}
+
+/* ============ INTERACTIONS ============ */
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-t]"); if (t) { tab = t.dataset.t; render(); scrollTo(0,0); }
+  const d = e.target.closest("[data-del]"); if (d && confirm("Supprimer ce post ?")) Store.del(d.dataset.del);
+  if (e.target.id === "sv") { me = { name: $("#mn").value.trim(), team: $("#mt").value }; saveMe(); render(); }
+  if (e.target.id === "ad") { if ($("#pin").value === CONFIG.adminPin) { admin = true; render(); } else alert("PIN incorrect"); }
+  if (e.target.id === "add") openForm();
+});
+function openForm(){
+  const dlg = $("#dlg");
+  dlg.innerHTML = `<h2 style="margin-bottom:14px">Déclarer un défi</h2>
+  <label>Prénom</label><input id="fn" value="${esc(me.name||"")}">
+  <label>Équipe</label><select id="ft">${CONFIG.teams.map(t=>`<option ${me.team===t?"selected":""}>${esc(t)}</option>`).join("")}</select>
+  <label>Défi relevé</label><select id="fc">${CONFIG.challenges.map(c=>`<option value="${c.id}">[${c.lvl}] ${esc(c.t)}</option>`).join("")}</select>
+  <label>Commentaire (optionnel)</label><textarea id="fo" rows="2"></textarea>
+  <label>Lien vers la preuve (photo, Drive, Insta…)</label><input id="fl" type="url" placeholder="https://">
+  <div class="row sp"><button class="g" id="fx">Annuler</button><button class="p" id="fs">Publier</button></div>`;
+  dlg.showModal();
+  $("#fx").onclick = () => dlg.close();
+  $("#fs").onclick = async () => {
+    const member = $("#fn").value.trim(), team = $("#ft").value, cid = $("#fc").value;
+    if (!member) return alert("Indique ton prénom.");
+    if (posts.some(p => p.member.toLowerCase() === member.toLowerCase() && p.team === team && p.cid === cid)) return alert("Tu as déjà validé ce défi.");
+    await Store.add({ member, team, cid, note: $("#fo").value.trim().slice(0,300), link: $("#fl").value.trim(), ts: Date.now() });
+    me = { name: member, team }; saveMe(); dlg.close(); tab = "feed"; render();
+  };
+}
+Store.sub(p => { posts = p; render(); });
+render();
 </script>
 </body>
 </html>

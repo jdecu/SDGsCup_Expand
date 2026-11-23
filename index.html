@@ -82,7 +82,7 @@ dialog::backdrop{background:#0008}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script>
-/* ============ CONFIGURATION (à modifier) ============ */
+/* ============ CONFIGURATION ============ */
 const c = (id,grp,sdg,pts,t,rep=false) => ({id,grp,sdg,pts,t,rep});
 const CONFIG = {
   start: "2027-02-01",                 // date de lancement
@@ -91,6 +91,15 @@ const CONFIG = {
   /* Semaine par ODD (à adapter !). Pour un défi précis, ajoute w:"S2" dans sa ligne. */
   weekOfOdd: {1:"S1",2:"S1",3:"S1",4:"S1",7:"S2",8:"S2",10:"S2",11:"S2",12:"S3",13:"S3",14:"S3",15:"S3",16:"S4",17:"S4"},
   teams: ["CxO", "HR", "CU", "SSU", "STU", "QU", "CommU"],
+  teamPins: {
+    CxO: "5678",
+    HR: "9012",
+    CU: "3456",
+    SSU: "7890",
+    STU: "2345",
+    QU: "6789",
+    CommU: "0123"
+  },
   /* Défis : c(id, groupe, n° ODD, points, texte, répétable?) */
   challenges: [
     c("o1","Défis ODD",1,10,"Grand tri de vêtements/objets et dépôt dans une association"),
@@ -255,9 +264,11 @@ function vChal(){
 }
 function vMe(){
   const mine = posts.filter(p => p.member === me.name && p.team === me.team);
+  const pinRequired = !!me.team && me.team !== me.verifiedTeam;
   return `<h2 style="margin:6px 4px 12px">Mon profil</h2><div class="card">
     <label>Mon prénom</label><input id="mn" value="${esc(me.name||"")}" placeholder="Ex : Camille">
     <label>Mon département</label><select id="mt"><option value="">Choisir…</option>${CONFIG.teams.map(t=>`<option ${me.team===t?"selected":""}>${esc(t)}</option>`).join("")}</select>
+    ${pinRequired ? `<label>PIN du département</label><input id="mtp" type="password" inputmode="numeric" autocomplete="off" placeholder="Code PIN du département">` : me.verifiedTeam ? `<p class="mute">Département vérifié : ${esc(me.verifiedTeam)}</p>` : ""}
     <button class="p" id="sv">Enregistrer</button></div>
     ${me.name?`<div class="card"><b>${mine.length} défi${mine.length>1?"s":""} validé${mine.length>1?"s":""}</b> · ${mine.reduce((s,p)=>s+pts(p),0)} pts</div>`:""}
     <div class="card"><label>Mode organisateur</label>${admin?`<p class="mute">Activé : tu peux supprimer des posts depuis le feed.</p><label>Semaine en cours</label><select id="wcur"><option value="">Pas encore commencé</option>${CONFIG.weeks.map(w => `<option ${curW === w ? "selected" : ""}>${w}</option>`).join("")}</select><p class="mute">La semaine choisie s'affiche sur l'accueil et ses défis deviennent visibles. Tu peux masquer ou afficher chaque semaine dans l'onglet Défis.</p>`:`<input id="pin" type="password" placeholder="PIN"><button class="g" id="ad">Activer</button>`}</div>`;
@@ -271,6 +282,10 @@ function render(){
 /* ============ INTERACTIONS ============ */
 document.addEventListener("change", e => {
   if (e.target.id === "wcur") { const v = e.target.value; Store.setC(v); if (v) { Store.setW(v, true); wsel = v; } }
+  if (e.target.id === "mt") {
+    me = { ...me, team: e.target.value };
+    render();
+  }
 });
 document.addEventListener("click", e => {
   const wk = e.target.closest("[data-w]"); if (wk) { wsel = wk.dataset.w; render(); }
@@ -279,16 +294,36 @@ document.addEventListener("click", e => {
   if (e.target.closest("[data-wt]")) Store.setW(wsel, !wkVisible(wsel));
   const t = e.target.closest("[data-t]"); if (t) { tab = t.dataset.t; render(); scrollTo(0,0); }
   const d = e.target.closest("[data-del]"); if (d && confirm("Supprimer ce post ?")) Store.del(d.dataset.del);
-  if (e.target.id === "sv") { me = { name: $("#mn").value.trim(), team: $("#mt").value }; saveMe(); render(); }
+  if (e.target.id === "sv") {
+    const name = $("#mn").value.trim();
+    const team = $("#mt").value;
+    if (!name) return alert("Indique ton prénom.");
+    if (!team) return alert("Choisis ton département.");
+    if (me.verifiedTeam !== team) {
+      const enteredPin = $("#mtp")?.value.trim();
+      if (enteredPin !== String(CONFIG.teamPins[team])) return alert("PIN du département incorrect.");
+      me = { name, team, verifiedTeam: team };
+    } else {
+      me = { ...me, name, team };
+    }
+    saveMe();
+    render();
+  }
   if (e.target.id === "ad") { if ($("#pin").value === CONFIG.adminPin) { admin = true; render(); } else alert("PIN incorrect"); }
   if (e.target.id === "add") openForm();
 });
 function openForm(){
   if (!avail().length) return alert("Aucun défi n'est ouvert pour le moment.");
+  if (!me.name || !me.team || me.verifiedTeam !== me.team) {
+    tab = "me";
+    render();
+    scrollTo(0, 0);
+    return alert("Renseigne ton prénom et vérifie ton département avec son PIN.");
+  }
   const dlg = $("#dlg");
   dlg.innerHTML = `<h2 style="margin-bottom:14px">Déclarer un défi</h2>
   <label>Prénom</label><input id="fn" value="${esc(me.name||"")}">
-  <label>Département</label><select id="ft">${CONFIG.teams.map(t=>`<option ${me.team===t?"selected":""}>${esc(t)}</option>`).join("")}</select>
+  <label>Département</label><select id="ft" disabled>${CONFIG.teams.map(t=>`<option ${me.team===t?"selected":""}>${esc(t)}</option>`).join("")}</select>
   <label>Défi relevé</label><select id="fc">${Object.keys(ODD).filter(n=>avail().some(x=>x.sdg==n)).map(n=>`<optgroup label="ODD ${n} · ${esc(ODD[n])}">${avail().filter(x=>x.sdg==n).map(x=>`<option value="${x.id}">+${x.pts} · ${esc(x.t)}${x.grp.startsWith("CEMS")?" ("+esc(x.grp)+")":""}</option>`).join("")}</optgroup>`).join("")}</select>
   <div id="fq" hidden><label>Nombre de tranches de 2 €</label><input id="fqn" type="number" min="1" value="1"></div>
   <label>Commentaire (optionnel)</label><textarea id="fo" rows="2"></textarea>
@@ -300,6 +335,7 @@ function openForm(){
   $("#fs").onclick = async () => {
     const member = $("#fn").value.trim(), team = $("#ft").value, cid = $("#fc").value;
     if (!member) return alert("Indique ton prénom.");
+    if (team !== me.team || me.verifiedTeam !== team) return alert("Ton département doit être vérifié dans Mon profil.");
     if (!ch(cid).rep && posts.some(p => p.member.toLowerCase() === member.toLowerCase() && p.team === team && p.cid === cid)) return alert("Tu as déjà validé ce défi.");
     await Store.add({ member, team, cid, qty: +$("#fqn").value||1, note: $("#fo").value.trim().slice(0,300), link: $("#fl").value.trim(), ts: Date.now() });
     me = { name: member, team }; saveMe(); dlg.close(); tab = "feed"; render();

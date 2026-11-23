@@ -109,21 +109,21 @@ const CONFIG = {
     c("o14","Défis ODD",14,10,"Éviter les produits de la mer"),
     c("o15a","Défis ODD",15,20,"Ramassage de déchets autour du lac ou du parc de la Source"),
     c("o15b","Défis ODD",15,2,"Bonus photo : canette de Cara, capote, capsule ou mégot",true),
-    c("l1","CEMS · Lundi",17,5,"Passer son navigateur sur Ecosia"),
-    c("l2","CEMS · Lundi",17,10,"Cuisiner et manger un repas végétarien"),
-    c("l3","CEMS · Lundi",17,15,"Donner son sang avant vendredi"),
-    c("m1","CEMS · Mardi",17,5,"Marcher 10 000 pas dans la journée"),
-    c("m2","CEMS · Mardi",17,10,"Convaincre ses amis des vertus de l'éco-responsabilité (speech)"),
-    c("m3","CEMS · Mardi",17,15,"Réparer quelque chose au lieu de le remplacer"),
-    c("w1","CEMS · Mercredi",17,5,"Apporter son lunch dans un contenant réutilisable"),
-    c("w2","CEMS · Mercredi",17,10,"Donner des vêtements"),
-    c("w3","CEMS · Mercredi",17,15,"Courses chez färm ou dans un magasin durable"),
-    c("j1","CEMS · Jeudi",17,5,"Manger au RestU"),
-    c("j2","CEMS · Jeudi",17,10,"Écrire deux éco-résolutions pour l'année"),
-    c("j3","CEMS · Jeudi",17,15,"Pas plus d'1 h de téléphone dans la journée"),
-    c("v1","CEMS · Vendredi",17,5,"Supprimer tous ses spams"),
-    c("v2","CEMS · Vendredi",17,10,"Prendre les transports en commun"),
-    c("v3","CEMS · Vendredi",17,15,"Une journée sans rien acheter emballé dans du plastique")
+    c("l1","CEMS · Lundi",13,5,"Passer son navigateur sur Ecosia"),
+    c("l2","CEMS · Lundi",13,10,"Cuisiner et manger un repas végétarien"),
+    c("l3","CEMS · Lundi",3,15,"Donner son sang avant vendredi"),
+    c("m1","CEMS · Mardi",3,5,"Marcher 10 000 pas dans la journée"),
+    c("m2","CEMS · Mardi",12,10,"Convaincre ses amis des vertus de l'éco-responsabilité (speech)"),
+    c("m3","CEMS · Mardi",12,15,"Réparer quelque chose au lieu de le remplacer"),
+    c("w1","CEMS · Mercredi",12,5,"Apporter son lunch dans un contenant réutilisable"),
+    c("w2","CEMS · Mercredi",1,10,"Donner des vêtements"),
+    c("w3","CEMS · Mercredi",2,15,"Courses chez färm ou dans un magasin durable"),
+    c("j1","CEMS · Jeudi",12,5,"Manger au RestU"),
+    c("j2","CEMS · Jeudi",13,10,"Écrire deux éco-résolutions pour l'année"),
+    c("j3","CEMS · Jeudi",7,15,"Pas plus d'1 h de téléphone dans la journée"),
+    c("v1","CEMS · Vendredi",7,5,"Supprimer tous ses spams"),
+    c("v2","CEMS · Vendredi",13,10,"Prendre les transports en commun"),
+    c("v3","CEMS · Vendredi",12,15,"Une journée sans rien acheter emballé dans du plastique")
   ],
   /* Mode temps réel : colle ici ta config Firebase (Realtime Database).
      Laisse null pour tester en mode démo (stockage local, non partagé). */
@@ -160,6 +160,8 @@ const Store = (() => {
 /* ============ ÉTAT ============ */
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const ODD = {1:"Pas de pauvreté",2:"Faim zéro",3:"Bonne santé et bien-être",4:"Éducation de qualité",5:"Égalité entre les sexes",6:"Eau propre et assainissement",7:"Énergie propre et d'un coût abordable",8:"Travail décent et croissance économique",9:"Industrie, innovation et infrastructure",10:"Inégalités réduites",11:"Villes et communautés durables",12:"Consommation et production responsables",13:"Lutte contre le changement climatique",14:"Vie aquatique",15:"Vie terrestre",16:"Paix, justice et institutions efficaces",17:"Partenariats pour la réalisation des objectifs"};
+const oddList = () => [...new Set(CONFIG.challenges.map(x => x.sdg))].sort((a,b) => a-b);
 const ch = id => CONFIG.challenges.find(c => c.id === id);
 const pts = p => { const x = ch(p.cid); return x ? x.pts * (x.id==='o8a' ? Math.max(1, +p.qty||1) : 1) : 0; };
 let posts = [], tab = "feed", admin = false;
@@ -190,10 +192,12 @@ function vRank(){
     <div class="bar"><i style="width:${x.p/max*100}%"></i></div></div></div></div>`).join("");
 }
 function vChal(){
-  const groups = [...new Set(CONFIG.challenges.map(x => x.grp))];
-  return `<h2 style="margin:6px 4px 12px">Les défis</h2>` + groups.map(g =>
-    `<h3 style="margin:18px 4px 8px">${esc(g)}</h3>` + CONFIG.challenges.filter(x => x.grp === g).map(x =>
-    `<div class="card row sp"><div class="row"><div class="sdg">${x.sdg}</div><div>${esc(x.t)}${x.rep?`<div class="mute">Répétable</div>`:""}</div></div><div class="pts">+${x.pts}</div></div>`).join("")).join("");
+  return `<h2 style="margin:6px 4px 12px">Les défis par ODD</h2>` + Object.keys(ODD).map(n => {
+    const l = CONFIG.challenges.filter(x => x.sdg == n);
+    return `<div class="row" style="margin:22px 4px 8px"><div class="sdg">${n}</div><h3>${esc(ODD[n])}</h3></div>` + (l.length ? l.map(x =>
+      `<div class="card row sp"><div>${esc(x.t)}${x.grp.startsWith("CEMS")||x.rep?`<div class="mute">${x.grp.startsWith("CEMS")?esc(x.grp):""}${x.grp.startsWith("CEMS")&&x.rep?" · ":""}${x.rep?"Répétable":""}</div>`:""}</div><div class="pts">+${x.pts}</div></div>`).join("")
+      : `<p class="mute" style="margin:0 4px">Pas encore de défi.</p>`);
+  }).join("");
 }
 function vMe(){
   const mine = posts.filter(p => p.member === me.name && p.team === me.team);
@@ -223,7 +227,7 @@ function openForm(){
   dlg.innerHTML = `<h2 style="margin-bottom:14px">Déclarer un défi</h2>
   <label>Prénom</label><input id="fn" value="${esc(me.name||"")}">
   <label>Équipe</label><select id="ft">${CONFIG.teams.map(t=>`<option ${me.team===t?"selected":""}>${esc(t)}</option>`).join("")}</select>
-  <label>Défi relevé</label><select id="fc">${[...new Set(CONFIG.challenges.map(x=>x.grp))].map(g=>`<optgroup label="${esc(g)}">${CONFIG.challenges.filter(x=>x.grp===g).map(x=>`<option value="${x.id}">+${x.pts} · ${esc(x.t)}</option>`).join("")}</optgroup>`).join("")}</select>
+  <label>Défi relevé</label><select id="fc">${Object.keys(ODD).filter(n=>CONFIG.challenges.some(x=>x.sdg==n)).map(n=>`<optgroup label="ODD ${n} · ${esc(ODD[n])}">${CONFIG.challenges.filter(x=>x.sdg==n).map(x=>`<option value="${x.id}">+${x.pts} · ${esc(x.t)}${x.grp.startsWith("CEMS")?" ("+esc(x.grp)+")":""}</option>`).join("")}</optgroup>`).join("")}</select>
   <div id="fq" hidden><label>Nombre de tranches de 2 €</label><input id="fqn" type="number" min="1" value="1"></div>
   <label>Commentaire (optionnel)</label><textarea id="fo" rows="2"></textarea>
   <label>Lien vers la preuve (photo, Drive, Insta…)</label><input id="fl" type="url" placeholder="https://">

@@ -35,6 +35,22 @@ nav .tab.on{color:var(--gold);font-weight:700}
 nav .tab.on svg{background:color-mix(in srgb,var(--gold) 16%,transparent)}
 nav .fab{justify-self:center;display:grid;place-items:center;width:60px;height:60px;border-radius:50%;background:var(--gold);color:var(--onacc);font:400 2.2rem/1 'DM Sans',sans-serif;border:0;padding:0 0 3px;margin-top:-34px;cursor:pointer;box-shadow:0 0 0 6px var(--card),0 8px 18px #00000033}
 nav .fab:active{transform:scale(.95)}
+.wk{display:flex;gap:8px;overflow-x:auto}
+.wk button{border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:7px 18px;font:700 .95rem 'DM Sans',sans-serif;cursor:pointer}
+.wk button.on{background:var(--gold);border-color:var(--gold);color:var(--onacc)}
+.help-btn{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--line);background:var(--card);font:800 1rem 'DM Sans',sans-serif;color:var(--ink);cursor:pointer}
+.tour-layer{position:fixed;inset:0;z-index:90}
+.tour-block{position:fixed;inset:0}
+.tour-hole{position:fixed;border-radius:16px;box-shadow:0 0 0 9999px rgba(8,25,16,.7);transition:all .25s;pointer-events:none;outline:3px solid var(--gold);outline-offset:2px}
+.tour-hole.none{outline:0;width:0!important;height:0!important;left:50%!important;top:50%!important}
+.tour-card{position:fixed;background:var(--card);color:var(--ink);border-radius:20px;width:min(340px,calc(100vw - 24px));padding:18px;box-shadow:0 20px 50px #0006}
+.tour-card .tc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.tour-card .skip{border:0;background:none;color:var(--mute);font:600 .85rem 'DM Sans',sans-serif;cursor:pointer}
+.tour-card h3{font-size:1.3rem;margin:2px 0 8px}
+.tour-card p{margin:0 0 8px;line-height:1.5}
+.tour-card .tdots{display:flex;gap:5px;margin:10px 0 12px}
+.tour-card .tdots i{width:6px;height:6px;border-radius:50%;background:var(--line)}
+.tour-card .tdots i.on{background:var(--gold);width:18px;border-radius:99px}
 button.p{background:var(--gold);color:var(--onacc);border:0;border-radius:10px;padding:10px 16px;font:700 .95rem 'DM Sans';cursor:pointer}
 button.g{background:none;border:1.5px solid var(--line);color:var(--ink);border-radius:10px;padding:8px 12px;font:600 .85rem 'DM Sans';cursor:pointer}
 :focus-visible{outline:3px solid var(--gold);outline-offset:2px}
@@ -51,7 +67,7 @@ dialog::backdrop{background:#0008}
 <body>
 <header>
   <div class="row"><img src="logo.png" alt="Expand Consulting" class="logo" onerror="this.remove()"><div><b>SDGs Cup</b><small>Expand Consulting</small></div></div>
-  <span class="mute" id="status" style="white-space:nowrap"></span>
+  <div class="row"><span class="mute" id="status" style="white-space:nowrap"></span><button class="help-btn" id="help" aria-label="Aide : refaire le tour" title="Refaire le tour">?</button></div>
 </header>
 <main id="app"></main>
 <nav><div>
@@ -71,6 +87,9 @@ const c = (id,grp,sdg,pts,t,rep=false) => ({id,grp,sdg,pts,t,rep});
 const CONFIG = {
   start: "2026-11-23",                 // date de lancement
   adminPin: "1234",                    // PIN pour supprimer des posts (à changer !)
+  weeks: ["S1", "S2", "S3", "S4"],     // chaque semaine commence 7 jours après la précédente (à partir de "start")
+  /* Semaine par ODD (à adapter !). Pour un défi précis, ajoute w:"S2" dans sa ligne. */
+  weekOfOdd: {1:"S1",2:"S1",3:"S1",4:"S1",7:"S2",8:"S2",10:"S2",11:"S2",12:"S3",13:"S3",14:"S3",15:"S3"},
   teams: ["CxO", "HR", "CU", "SSU", "STU", "QU", "CommU"],
   /* Défis : c(id, groupe, n° ODD, points, texte, répétable?) */
   challenges: [
@@ -175,14 +194,14 @@ function vFeed(){
   const d = Math.ceil((new Date(CONFIG.start) - new Date().setHours(0,0,0,0)) / 864e5);
   const hero = `<div class="card hero"><div class="mute" style="color:#fff9">${d>0?"Démarrage dans":"Compétition en cours"}</div>
     <div class="big">${d>0?d+" jour"+(d>1?"s":""):"C'est parti !"}</div>
-    <p>Relève les défis, poste ta preuve : ton équipe marque des points immédiatement.</p></div>`;
+    <p>Relève les défis, poste ta preuve : ton département marque des points immédiatement.</p></div>`;
   const list = posts.length ? posts.map(p => { const c = ch(p.cid) || {t:"Défi supprimé",sdg:"?"};
     return `<div class="card"><div class="row sp"><div class="row"><div class="sdg">${esc(c.sdg)}</div><div><b>${esc(p.member)}</b> <span class="mute">· ${esc(p.team)}</span><div class="mute">${ago(p.ts)}</div></div></div><div class="pts">+${pts(p)}</div></div>
     <p style="margin:12px 0 6px"><b>${esc(c.t)}</b> <span class="mute">· ODD ${esc(c.sdg)}</span></p>
     ${p.note?`<p style="margin:6px 0">${esc(p.note)}</p>`:""}
     ${/^https?:\/\//.test(p.link||"")?`<a href="${esc(p.link)}" target="_blank" rel="noopener">Voir la preuve</a>`:""}
     ${admin?`<div style="margin-top:8px"><button class="g" data-del="${esc(p.id)}">Supprimer</button></div>`:""}</div>`; }).join("")
-    : `<div class="card" style="text-align:center"><h3>Rien pour l'instant</h3><p class="mute">Sois la première équipe au classement : appuie sur +.</p></div>`;
+    : `<div class="card" style="text-align:center"><h3>Rien pour l'instant</h3><p class="mute">Sois le premier département au classement : appuie sur +.</p></div>`;
   return hero + `<div class="row sp" style="margin:6px 4px 10px"><h2>Le feed</h2><span class="mute">${posts.length} post${posts.length>1?"s":""}</span></div>` + list;
 }
 function vRank(){
@@ -191,19 +210,28 @@ function vRank(){
     <div style="flex:1"><div class="row sp"><b>${esc(x.t)}</b><span class="pts">${x.p} pts</span></div><div class="mute">${x.n} défi${x.n>1?"s":""} validé${x.n>1?"s":""}</div>
     <div class="bar"><i style="width:${x.p/max*100}%"></i></div></div></div></div>`).join("");
 }
+let wsel = null;
+const wkIdx = () => Math.min(Math.max(Math.floor((Date.now() - new Date(CONFIG.start + "T00:00:00")) / 864e5 / 7), 0), CONFIG.weeks.length - 1);
+const wkOf = x => x.w || CONFIG.weekOfOdd[x.sdg];
 function vChal(){
-  return `<h2 style="margin:6px 4px 12px">Les défis par ODD</h2>` + Object.keys(ODD).map(n => {
-    const l = CONFIG.challenges.filter(x => x.sdg == n);
-    return `<div class="row" style="margin:22px 4px 8px"><div class="sdg">${n}</div><h3>${esc(ODD[n])}</h3></div>` + (l.length ? l.map(x =>
-      `<div class="card row sp"><div>${esc(x.t)}${x.grp.startsWith("CEMS")||x.rep?`<div class="mute">${x.grp.startsWith("CEMS")?esc(x.grp):""}${x.grp.startsWith("CEMS")&&x.rep?" · ":""}${x.rep?"Répétable":""}</div>`:""}</div><div class="pts">+${x.pts}</div></div>`).join("")
-      : `<p class="mute" style="margin:0 4px">Pas encore de défi.</p>`);
-  }).join("");
+  const W = CONFIG.weeks; if (!wsel) wsel = W[wkIdx()];
+  const i = W.indexOf(wsel), a = new Date(CONFIG.start + "T12:00:00"); a.setDate(a.getDate() + 7*i);
+  const e = new Date(a); e.setDate(e.getDate() + 6);
+  const f = d => d.toLocaleDateString("fr-BE", {day:"numeric", month:"short"});
+  const list = CONFIG.challenges.filter(x => wkOf(x) === wsel);
+  const odds = Object.keys(ODD).filter(n => list.some(x => x.sdg == n));
+  return `<h2 style="margin:6px 4px 10px">Défis de la semaine</h2>
+  <div class="wk">${W.map(w => `<button data-w="${w}" class="${w === wsel ? "on" : ""}">${w}</button>`).join("")}</div>
+  <p class="mute" style="margin:4px 4px 0">${f(a)} – ${f(e)}${i === wkIdx() ? " · en cours" : ""}</p>` +
+  (odds.length ? odds.map(n => `<div class="row" style="margin:22px 4px 8px"><div class="sdg">${n}</div><h3>${esc(ODD[n])}</h3></div>` +
+    list.filter(x => x.sdg == n).map(x => `<div class="card row sp"><div>${esc(x.t)}${x.grp.startsWith("CEMS") || x.rep ? `<div class="mute">${x.grp.startsWith("CEMS") ? esc(x.grp) : ""}${x.grp.startsWith("CEMS") && x.rep ? " · " : ""}${x.rep ? "Répétable" : ""}</div>` : ""}</div><div class="pts">+${x.pts}</div></div>`).join("")).join("")
+   : `<div class="card" style="margin-top:16px;text-align:center"><h3>Pas encore de défi</h3><p class="mute">Les défis de ${wsel} seront bientôt annoncés.</p></div>`);
 }
 function vMe(){
   const mine = posts.filter(p => p.member === me.name && p.team === me.team);
   return `<h2 style="margin:6px 4px 12px">Mon profil</h2><div class="card">
     <label>Mon prénom</label><input id="mn" value="${esc(me.name||"")}" placeholder="Ex : Camille">
-    <label>Mon équipe</label><select id="mt"><option value="">Choisir…</option>${CONFIG.teams.map(t=>`<option ${me.team===t?"selected":""}>${esc(t)}</option>`).join("")}</select>
+    <label>Mon département</label><select id="mt"><option value="">Choisir…</option>${CONFIG.teams.map(t=>`<option ${me.team===t?"selected":""}>${esc(t)}</option>`).join("")}</select>
     <button class="p" id="sv">Enregistrer</button></div>
     ${me.name?`<div class="card"><b>${mine.length} défi${mine.length>1?"s":""} validé${mine.length>1?"s":""}</b> · ${mine.reduce((s,p)=>s+pts(p),0)} pts</div>`:""}
     <div class="card"><label>Mode organisateur</label>${admin?`<p class="mute">Activé : tu peux supprimer des posts depuis le feed.</p>`:`<input id="pin" type="password" placeholder="PIN"><button class="g" id="ad">Activer</button>`}</div>`;
@@ -216,6 +244,8 @@ function render(){
 
 /* ============ INTERACTIONS ============ */
 document.addEventListener("click", e => {
+  const wk = e.target.closest("[data-w]"); if (wk) { wsel = wk.dataset.w; render(); }
+  if (e.target.id === "help") showTour();
   const t = e.target.closest("[data-t]"); if (t) { tab = t.dataset.t; render(); scrollTo(0,0); }
   const d = e.target.closest("[data-del]"); if (d && confirm("Supprimer ce post ?")) Store.del(d.dataset.del);
   if (e.target.id === "sv") { me = { name: $("#mn").value.trim(), team: $("#mt").value }; saveMe(); render(); }
@@ -226,7 +256,7 @@ function openForm(){
   const dlg = $("#dlg");
   dlg.innerHTML = `<h2 style="margin-bottom:14px">Déclarer un défi</h2>
   <label>Prénom</label><input id="fn" value="${esc(me.name||"")}">
-  <label>Équipe</label><select id="ft">${CONFIG.teams.map(t=>`<option ${me.team===t?"selected":""}>${esc(t)}</option>`).join("")}</select>
+  <label>Département</label><select id="ft">${CONFIG.teams.map(t=>`<option ${me.team===t?"selected":""}>${esc(t)}</option>`).join("")}</select>
   <label>Défi relevé</label><select id="fc">${Object.keys(ODD).filter(n=>CONFIG.challenges.some(x=>x.sdg==n)).map(n=>`<optgroup label="ODD ${n} · ${esc(ODD[n])}">${CONFIG.challenges.filter(x=>x.sdg==n).map(x=>`<option value="${x.id}">+${x.pts} · ${esc(x.t)}${x.grp.startsWith("CEMS")?" ("+esc(x.grp)+")":""}</option>`).join("")}</optgroup>`).join("")}</select>
   <div id="fq" hidden><label>Nombre de tranches de 2 €</label><input id="fqn" type="number" min="1" value="1"></div>
   <label>Commentaire (optionnel)</label><textarea id="fo" rows="2"></textarea>
@@ -243,8 +273,51 @@ function openForm(){
     me = { name: member, team }; saveMe(); dlg.close(); tab = "feed"; render();
   };
 }
+/* ============ VISITE GUIDÉE ============ */
+let tourOn = false;
+function showTour(){
+  if (tourOn) return; tourOn = true;
+  const back = tab;
+  const steps = [
+    {t:"Bienvenue à la SDGs Cup 🌱", b:"<p>7 départements, 1 gagnant. Relève des défis liés aux ODD, poste ta preuve et fais gagner des points à ton département.</p><p>Petit tour rapide (30 secondes).</p>"},
+    {sel:'[data-t="feed"]', view:"feed", t:"Le feed", b:"<p>Toutes les publications de tous les départements apparaissent ici, en direct.</p>"},
+    {sel:'[data-t="chal"]', view:"chal", t:"Les défis", b:"<p>Les défis sont organisés par semaine (S1, S2, S3…), puis par ODD. Choisis la semaine avec les boutons en haut de la page.</p><p>Chaque défi indique les points qu'il rapporte.</p>"},
+    {sel:'[data-t="me"]', view:"me", t:"Ton département", b:"<p>Dans <b>Mon profil</b>, entre ton prénom et choisis ton département.</p><p>Tu ne le fais qu'une fois : le site s'en souvient sur cet appareil.</p>"},
+    {sel:"#add", t:"Déclarer un défi", b:"<p>Défi relevé ? Appuie sur le <b>+</b>, choisis le défi, ajoute un commentaire et un lien vers ta preuve (photo, Drive, Insta…).</p><p>Chaque membre poste sa propre preuve : chaque post rapporte des points à ton département.</p>"},
+    {sel:'[data-t="rank"]', view:"rank", t:"Le classement", b:"<p>Suis en direct le classement des départements. Les organisateurs vérifient les posts et suppriment les fraudes.</p>"},
+    {sel:"#help", t:"Besoin d'aide plus tard ?", b:"<p>Appuie sur ce « ? » à tout moment pour relancer le tour.</p>"}
+  ];
+  let i = 0, tm;
+  const hole = document.createElement("div"); hole.className = "tour-hole none";
+  const card = document.createElement("div"); card.className = "tour-card";
+  const layer = document.createElement("div"); layer.className = "tour-layer"; layer.innerHTML = '<div class="tour-block"></div>';
+  layer.append(hole, card);
+  const end = () => { try { localStorage.setItem("sdgcup_tour", "1"); } catch (e) {} tourOn = false; clearInterval(tm); removeEventListener("resize", place); layer.remove(); tab = back === "me" ? "feed" : back; render(); scrollTo(0, 0); };
+  function place(){
+    const st = steps[i], el = st.sel ? document.querySelector(st.sel) : null, W = innerWidth, H = innerHeight, cw = Math.min(340, W - 24);
+    if (!el){ hole.className = "tour-hole none"; Object.assign(card.style, {left:(W-cw)/2+"px", top:Math.max(16,(H-card.offsetHeight)/2)+"px", bottom:"auto"}); return; }
+    const r = el.getBoundingClientRect(), p = 6;
+    hole.className = "tour-hole";
+    Object.assign(hole.style, {left:r.left-p+"px", top:r.top-p+"px", width:r.width+p*2+"px", height:r.height+p*2+"px", borderRadius:(r.width < 70 && Math.abs(r.width-r.height) < 12) ? "50%" : "16px"});
+    const left = Math.min(Math.max(12, r.left + r.width/2 - cw/2), W - cw - 12);
+    if (r.top + r.height/2 > H/2) Object.assign(card.style, {left:left+"px", top:"auto", bottom:H-r.top+16+"px"});
+    else Object.assign(card.style, {left:left+"px", top:r.bottom+16+"px", bottom:"auto"});
+  }
+  function draw(){
+    const st = steps[i], last = i === steps.length - 1;
+    if (st.view && tab !== st.view){ tab = st.view; render(); scrollTo(0, 0); }
+    card.innerHTML = `<div class="tc-top"><span class="mute">${i+1} / ${steps.length}</span>${last ? "" : '<button class="skip">Passer</button>'}</div><h3>${st.t}</h3>${st.b}<div class="tdots">${steps.map((_, k) => `<i class="${k === i ? "on" : ""}"></i>`).join("")}</div><div class="row">${i ? '<button class="g back">Retour</button>' : ""}<button class="p next" style="flex:1">${last ? "C'est parti !" : i ? "Suivant" : "Démarrer le tour"}</button></div>`;
+    const q = s => card.querySelector(s);
+    if (q(".skip")) q(".skip").onclick = end;
+    if (q(".back")) q(".back").onclick = () => { i--; draw(); };
+    q(".next").onclick = () => { if (last) end(); else { i++; draw(); } };
+    place();
+  }
+  document.body.append(layer); addEventListener("resize", place); tm = setInterval(place, 300); draw();
+}
 Store.sub(p => { posts = p; render(); });
 render();
+try { if (!localStorage.getItem("sdgcup_tour")) setTimeout(showTour, 500); } catch (e) {}
 </script>
 </body>
 </html>

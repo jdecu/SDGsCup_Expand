@@ -155,8 +155,14 @@ const Store = (() => {
   if (CONFIG.firebase) {
     firebase.initializeApp(CONFIG.firebase);
     const ref = firebase.database().ref("posts");
+    const wref = firebase.database().ref("settings/weeks");
+    const cref = firebase.database().ref("settings/current");
     return {
       live: true,
+      subW(cb){ wref.on("value", s => cb(s.val() || {})); },
+      subC(cb){ cref.on("value", s => cb(s.val() || "")); },
+      setC(v){ return cref.set(v || null); },
+      setW(w, v){ return wref.child(w).set(v); },
       sub(cb){ ref.on("value", s => { const v = s.val() || {}; cb(Object.entries(v).map(([id,p]) => ({...p, id})).sort((a,b)=>b.ts-a.ts)); }); },
       add(p){ return ref.push(p); },
       del(id){ return ref.child(id).remove(); }
@@ -165,11 +171,20 @@ const Store = (() => {
   const K = "sdgcup_posts";
   const load = () => { try { return JSON.parse(localStorage.getItem(K)) || []; } catch { return []; } };
   const save = a => { try { localStorage.setItem(K, JSON.stringify(a)); } catch {} };
-  let cb = () => {};
+  let cb = () => {}, wcb = () => {}, ccb = () => {};
+  const KC = "sdgcup_current";
+  const emitC = () => ccb(localStorage.getItem(KC) || "");
+  const KW = "sdgcup_weeks";
+  const loadW = () => { try { return JSON.parse(localStorage.getItem(KW)) || {}; } catch { return {}; } };
+  const emitW = () => wcb(loadW());
   const emit = () => cb(load().sort((a,b)=>b.ts-a.ts));
-  addEventListener("storage", emit);
+  addEventListener("storage", () => { emit(); emitW(); emitC(); });
   return {
     live: false,
+    subW(f){ wcb = f; emitW(); },
+    subC(f){ ccb = f; emitC(); },
+    setC(v){ try { localStorage.setItem(KC, v || ""); } catch {} emitC(); },
+    setW(w, v){ const o = loadW(); o[w] = v; try { localStorage.setItem(KW, JSON.stringify(o)); } catch {} emitW(); },
     sub(f){ cb = f; emit(); },
     add(p){ const a = load(); a.push({...p, id: "p" + Date.now()}); save(a); emit(); },
     del(id){ save(load().filter(p => p.id !== id)); emit(); }
@@ -191,10 +206,13 @@ const scores = () => CONFIG.teams.map(t => ({ t, p: posts.filter(x => x.team ===
 
 /* ============ VUES ============ */
 function vFeed(){
-  const d = Math.ceil((new Date(CONFIG.start) - new Date().setHours(0,0,0,0)) / 864e5);
-  const hero = `<div class="card hero"><div class="mute" style="color:#fff9">${d>0?"Démarrage dans":"Compétition en cours"}</div>
-    <div class="big">${d>0?d+" jour"+(d>1?"s":""):"C'est parti !"}</div>
-    <p>Relève les défis, poste ta preuve : ton département marque des points immédiatement.</p></div>`;
+  const n = curW ? CONFIG.challenges.filter(x => wkOf(x) === curW).length : 0;
+  const hero = curW
+    ? `<div class="card hero"><div class="mute" style="color:#fff9">Cette semaine</div><div class="big">${esc(curW)}</div>
+       <p>${n} défi${n > 1 ? "s" : ""} à relever. Poste ta preuve : ton département marque des points immédiatement.</p>
+       <button class="p" style="margin-top:12px;background:#fff;color:var(--dark)" data-go="chal">Voir les défis</button></div>`
+    : `<div class="card hero"><div class="mute" style="color:#fff9">Bientôt</div><div class="big" style="font-size:2.2rem">Pas encore commencé</div>
+       <p>Les défis seront dévoilés par les organisateurs. Reste connecté !</p></div>`;
   const list = posts.length ? posts.map(p => { const c = ch(p.cid) || {t:"Défi supprimé",sdg:"?"};
     return `<div class="card"><div class="row sp"><div class="row"><div class="sdg">${esc(c.sdg)}</div><div><b>${esc(p.member)}</b> <span class="mute">· ${esc(p.team)}</span><div class="mute">${ago(p.ts)}</div></div></div><div class="pts">+${pts(p)}</div></div>
     <p style="margin:12px 0 6px"><b>${esc(c.t)}</b> <span class="mute">· ODD ${esc(c.sdg)}</span></p>
@@ -210,20 +228,22 @@ function vRank(){
     <div style="flex:1"><div class="row sp"><b>${esc(x.t)}</b><span class="pts">${x.p} pts</span></div><div class="mute">${x.n} défi${x.n>1?"s":""} validé${x.n>1?"s":""}</div>
     <div class="bar"><i style="width:${x.p/max*100}%"></i></div></div></div></div>`).join("");
 }
-let wsel = null;
+let wsel = null, weeksOn = {}, curW = "";
+const wkVisible = w => weeksOn[w] === true;
+const avail = () => CONFIG.challenges.filter(x => admin || wkVisible(wkOf(x)));
 const wkIdx = () => Math.min(Math.max(Math.floor((Date.now() - new Date(CONFIG.start + "T00:00:00")) / 864e5 / 7), 0), CONFIG.weeks.length - 1);
 const wkOf = x => x.w || CONFIG.weekOfOdd[x.sdg];
 function vChal(){
-  const W = CONFIG.weeks; if (!wsel) wsel = W[wkIdx()];
-  const i = W.indexOf(wsel), a = new Date(CONFIG.start + "T12:00:00"); a.setDate(a.getDate() + 7*i);
-  const e = new Date(a); e.setDate(e.getDate() + 6);
-  const f = d => d.toLocaleDateString("fr-BE", {day:"numeric", month:"short"});
-  const list = CONFIG.challenges.filter(x => wkOf(x) === wsel);
+  const W = CONFIG.weeks; if (!wsel) wsel = curW || W[0];
+  const off = !wkVisible(wsel), lock = off && !admin;
+  const list = lock ? [] : CONFIG.challenges.filter(x => wkOf(x) === wsel);
   const odds = Object.keys(ODD).filter(n => list.some(x => x.sdg == n));
+  const adminBar = admin ? `<div class="card row sp" style="margin-top:14px"><div><b>${off ? "Semaine masquée" : "Semaine visible"}</b><div class="mute">${off ? "Les membres ne voient pas ces défis." : "Les membres voient ces défis."}</div></div><button class="${off ? "p" : "g"}" data-wt>${off ? "Afficher" : "Masquer"}</button></div>` : "";
+  const lockCard = `<div class="card" style="margin-top:16px;text-align:center"><h3>🔒 Pas encore ouverte</h3><p class="mute">Les défis de ${wsel} seront dévoilés bientôt.</p></div>`;
   return `<h2 style="margin:6px 4px 10px">Défis de la semaine</h2>
-  <div class="wk">${W.map(w => `<button data-w="${w}" class="${w === wsel ? "on" : ""}">${w}</button>`).join("")}</div>
-  <p class="mute" style="margin:4px 4px 0">${f(a)} – ${f(e)}${i === wkIdx() ? " · en cours" : ""}</p>` +
-  (odds.length ? odds.map(n => `<div class="row" style="margin:22px 4px 8px"><div class="sdg">${n}</div><h3>${esc(ODD[n])}</h3></div>` +
+  <div class="wk">${W.map(w => `<button data-w="${w}" class="${w === wsel ? "on" : ""}">${w}${wkVisible(w) ? "" : " 🔒"}</button>`).join("")}</div>
+  <p class="mute" style="margin:4px 4px 0">${curW === wsel ? "Semaine en cours" : "&nbsp;"}</p>` + adminBar +
+  (lock ? lockCard : odds.length ? odds.map(n => `<div class="row" style="margin:22px 4px 8px"><div class="sdg">${n}</div><h3>${esc(ODD[n])}</h3></div>` +
     list.filter(x => x.sdg == n).map(x => `<div class="card row sp"><div>${esc(x.t)}${x.grp.startsWith("CEMS") || x.rep ? `<div class="mute">${x.grp.startsWith("CEMS") ? esc(x.grp) : ""}${x.grp.startsWith("CEMS") && x.rep ? " · " : ""}${x.rep ? "Répétable" : ""}</div>` : ""}</div><div class="pts">+${x.pts}</div></div>`).join("")).join("")
    : `<div class="card" style="margin-top:16px;text-align:center"><h3>Pas encore de défi</h3><p class="mute">Les défis de ${wsel} seront bientôt annoncés.</p></div>`);
 }
@@ -234,7 +254,7 @@ function vMe(){
     <label>Mon département</label><select id="mt"><option value="">Choisir…</option>${CONFIG.teams.map(t=>`<option ${me.team===t?"selected":""}>${esc(t)}</option>`).join("")}</select>
     <button class="p" id="sv">Enregistrer</button></div>
     ${me.name?`<div class="card"><b>${mine.length} défi${mine.length>1?"s":""} validé${mine.length>1?"s":""}</b> · ${mine.reduce((s,p)=>s+pts(p),0)} pts</div>`:""}
-    <div class="card"><label>Mode organisateur</label>${admin?`<p class="mute">Activé : tu peux supprimer des posts depuis le feed.</p>`:`<input id="pin" type="password" placeholder="PIN"><button class="g" id="ad">Activer</button>`}</div>`;
+    <div class="card"><label>Mode organisateur</label>${admin?`<p class="mute">Activé : tu peux supprimer des posts depuis le feed.</p><label>Semaine en cours</label><select id="wcur"><option value="">Pas encore commencé</option>${CONFIG.weeks.map(w => `<option ${curW === w ? "selected" : ""}>${w}</option>`).join("")}</select><p class="mute">La semaine choisie s'affiche sur l'accueil et ses défis deviennent visibles. Tu peux masquer ou afficher chaque semaine dans l'onglet Défis.</p>`:`<input id="pin" type="password" placeholder="PIN"><button class="g" id="ad">Activer</button>`}</div>`;
 }
 function render(){
   $("#app").innerHTML = ({feed:vFeed,rank:vRank,chal:vChal,me:vMe})[tab]();
@@ -243,9 +263,14 @@ function render(){
 }
 
 /* ============ INTERACTIONS ============ */
+document.addEventListener("change", e => {
+  if (e.target.id === "wcur") { const v = e.target.value; Store.setC(v); if (v) { Store.setW(v, true); wsel = v; } }
+});
 document.addEventListener("click", e => {
   const wk = e.target.closest("[data-w]"); if (wk) { wsel = wk.dataset.w; render(); }
   if (e.target.id === "help") showTour();
+  const go = e.target.closest("[data-go]"); if (go) { tab = go.dataset.go; wsel = curW || wsel; render(); scrollTo(0, 0); }
+  if (e.target.closest("[data-wt]")) Store.setW(wsel, !wkVisible(wsel));
   const t = e.target.closest("[data-t]"); if (t) { tab = t.dataset.t; render(); scrollTo(0,0); }
   const d = e.target.closest("[data-del]"); if (d && confirm("Supprimer ce post ?")) Store.del(d.dataset.del);
   if (e.target.id === "sv") { me = { name: $("#mn").value.trim(), team: $("#mt").value }; saveMe(); render(); }
@@ -253,11 +278,12 @@ document.addEventListener("click", e => {
   if (e.target.id === "add") openForm();
 });
 function openForm(){
+  if (!avail().length) return alert("Aucun défi n'est ouvert pour le moment.");
   const dlg = $("#dlg");
   dlg.innerHTML = `<h2 style="margin-bottom:14px">Déclarer un défi</h2>
   <label>Prénom</label><input id="fn" value="${esc(me.name||"")}">
   <label>Département</label><select id="ft">${CONFIG.teams.map(t=>`<option ${me.team===t?"selected":""}>${esc(t)}</option>`).join("")}</select>
-  <label>Défi relevé</label><select id="fc">${Object.keys(ODD).filter(n=>CONFIG.challenges.some(x=>x.sdg==n)).map(n=>`<optgroup label="ODD ${n} · ${esc(ODD[n])}">${CONFIG.challenges.filter(x=>x.sdg==n).map(x=>`<option value="${x.id}">+${x.pts} · ${esc(x.t)}${x.grp.startsWith("CEMS")?" ("+esc(x.grp)+")":""}</option>`).join("")}</optgroup>`).join("")}</select>
+  <label>Défi relevé</label><select id="fc">${Object.keys(ODD).filter(n=>avail().some(x=>x.sdg==n)).map(n=>`<optgroup label="ODD ${n} · ${esc(ODD[n])}">${avail().filter(x=>x.sdg==n).map(x=>`<option value="${x.id}">+${x.pts} · ${esc(x.t)}${x.grp.startsWith("CEMS")?" ("+esc(x.grp)+")":""}</option>`).join("")}</optgroup>`).join("")}</select>
   <div id="fq" hidden><label>Nombre de tranches de 2 €</label><input id="fqn" type="number" min="1" value="1"></div>
   <label>Commentaire (optionnel)</label><textarea id="fo" rows="2"></textarea>
   <label>Lien vers la preuve (photo, Drive, Insta…)</label><input id="fl" type="url" placeholder="https://">
@@ -316,6 +342,8 @@ function showTour(){
   document.body.append(layer); addEventListener("resize", place); tm = setInterval(place, 300); draw();
 }
 Store.sub(p => { posts = p; render(); });
+Store.subW(w => { weeksOn = w || {}; render(); });
+Store.subC(v => { curW = v || ""; render(); });
 render();
 try { if (!localStorage.getItem("sdgcup_tour")) setTimeout(showTour, 500); } catch (e) {}
 </script>

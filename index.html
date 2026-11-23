@@ -218,7 +218,7 @@ function vFeed(){
        <p>${n} défi${n > 1 ? "s" : ""} à relever. Poste ta preuve : ton département marque des points immédiatement.</p>
        <button class="p" style="margin-top:12px;background:#fff;color:var(--dark)" data-go="chal">Voir les défis</button></div>`
     : `<div class="card hero"><div class="mute" style="color:#fff9">Bientôt</div><div class="big" style="font-size:2.2rem">Pas encore commencé</div>
-       <p>Les défis seront dévoilés par les organisateurs. Reste connecté !</p></div>`;
+       <p>Les défis seront dévoilés au début de la compétition, dès le lundi 1er février. Reste connecté !</p></div>`;
   const list = posts.length ? posts.map(p => { const c = ch(p.cid) || {t:"Défi supprimé",sdg:"?"};
     return `<div class="card"><div class="row sp"><div class="row"><div class="sdg">${esc(c.sdg)}</div><div><b>${esc(p.member)}</b> <span class="mute">· ${esc(p.team)}</span><div class="mute">${ago(p.ts)}</div></div></div><div class="pts">+${pts(p)}</div></div>
     <p style="margin:12px 0 6px"><b>${esc(c.t)}</b> <span class="mute">· ODD ${esc(c.sdg)}</span></p>

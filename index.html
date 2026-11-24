@@ -111,8 +111,8 @@ dialog::backdrop{background:#0008}
 /* ============ CONFIGURATION (à modifier) ============ */
 const PTS = {easy:5, medium:10, hard:15};   // points par niveau
 const TEAM_COLORS = ["#008A5E","#0A5C1A","#222222","#2FA37A","#4C9A2A","#1E6F5C","#6B8E23"];   // verts Expand + noir
-/* c(id, n° ODD, niveau, texte, {rep:répétable, unit:"2 €" pour des points par tranche, pts:points spéciaux}) */
-const c = (id,sdg,lvl,t,o={}) => ({id,sdg,lvl,t,rep:!!o.rep,unit:o.unit||"",pts:o.pts ?? PTS[lvl]});
+/* c(id, n° ODD, niveau, texte, {rep:true = répétable, unit:"2 €" = points par tranche, pts:points spéciaux, w:"S2" = forcer la semaine}) */
+const c = (id,sdg,lvl,t,o={}) => ({id,sdg,lvl,t,rep:!!o.rep,unit:o.unit||"",pts:o.pts ?? PTS[lvl],w:o.w});
 const CONFIG = {
   start: "2027-02-01",                 // date de lancement
   onlyCurrentWeek: false,              // true = on ne peut poster que les défis de la semaine en cours (false = aussi les semaines déjà ouvertes)

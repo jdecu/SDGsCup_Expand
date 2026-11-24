@@ -75,6 +75,8 @@ nav .fab:active{transform:scale(.95)}
 .lb{display:flex;align-items:center;gap:10px;padding:10px 6px;border-top:1px solid var(--line)}
 .lb.me{background:color-mix(in srgb,var(--gold) 10%,transparent);border-radius:12px}
 .lb .pos{width:24px;font-size:1.1rem}
+.g.danger{color:#C62828;border-color:#C62828}
+.orga{background:var(--dark);color:#fff;border:0;border-radius:99px;padding:3px 10px;font:800 .7rem 'DM Sans',sans-serif;margin-left:8px;cursor:pointer}
 button.p{background:var(--gold);color:var(--onacc);border:0;border-radius:10px;padding:10px 16px;font:700 .95rem 'DM Sans';cursor:pointer}
 button.g{background:none;border:1.5px solid var(--line);color:var(--ink);border-radius:10px;padding:8px 12px;font:600 .85rem 'DM Sans';cursor:pointer}
 :focus-visible{outline:3px solid var(--gold);outline-offset:2px}
@@ -113,6 +115,7 @@ const TEAM_COLORS = ["#008A5E","#0A5C1A","#222222","#2FA37A","#4C9A2A","#1E6F5C"
 const c = (id,sdg,lvl,t,o={}) => ({id,sdg,lvl,t,rep:!!o.rep,unit:o.unit||"",pts:o.pts ?? PTS[lvl]});
 const CONFIG = {
   start: "2027-02-01",                 // date de lancement
+  onlyCurrentWeek: false,              // true = on ne peut poster que les défis de la semaine en cours (false = aussi les semaines déjà ouvertes)
   adminPin: "1234",                    // PIN pour supprimer des posts (à changer !)
   weeks: ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11"],     // chaque semaine s'ouvre 7 jours après la précédente, à partir de "start"
   /* Semaine par ODD (à adapter !). Pour un défi précis, ajoute w:"S2" dans sa ligne. */
@@ -233,7 +236,8 @@ const refIdx = () => curW === "none" ? -1 : curW ? weekIdx(curW) : autoIdx();   
 const effCur = () => CONFIG.weeks[refIdx()] || "";
 const wkVisible = w => weeksOn[w] === true ? true : weeksOn[w] === false ? false : weekIdx(w) >= 0 && weekIdx(w) <= refIdx();
 const wkOf = x => x.w || CONFIG.weekOfOdd[x.sdg];
-const avail = () => CONFIG.challenges.filter(x => admin || wkVisible(wkOf(x)));
+const postable = x => !!x && wkVisible(wkOf(x)) && (!CONFIG.onlyCurrentWeek || wkOf(x) === effCur());   // vaut aussi pour les organisateurs
+const avail = () => CONFIG.challenges.filter(postable);
 const weekList = w => CONFIG.challenges.filter(x => wkOf(x) === w).sort((a,b) => LVO[a.lvl] - LVO[b.lvl]);
 
 /* ============ VUES ============ */
@@ -246,8 +250,8 @@ function postCard(p){
     <p class="auto">${esc(auto)}</p>
     ${p.note ? `<p style="margin:6px 0">${esc(p.note)}</p>` : ""}
     ${/^https?:\/\//.test(p.link||"") ? `<a href="${esc(p.link)}" target="_blank" rel="noopener">Voir la preuve</a>` : ""}
-    <div class="act row"><button class="ab ${liked ? "on" : ""}" data-like="${esc(p.id)}" aria-label="J'aime">${liked ? "♥" : "♡"} ${lk.length}</button><button class="ab" data-cm="${esc(p.id)}" aria-label="Commentaires">💬 ${cm.length}</button>${admin ? `<button class="g" data-del="${esc(p.id)}">Supprimer</button>` : ""}</div>
-    ${open ? `<div class="cms">${cm.map(v => `<div class="cm"><b>${esc(v.author)}</b> <span class="mute">· ${esc(v.team)} · ${ago(v.ts)}</span>${admin ? ` <button class="g" data-dcm="${esc(p.id)}" data-id="${esc(v.id)}">×</button>` : ""}<div>${esc(v.text)}</div></div>`).join("")}
+    <div class="act row"><button class="ab ${liked ? "on" : ""}" data-like="${esc(p.id)}" aria-label="J'aime">${liked ? "♥" : "♡"} ${lk.length}</button><button class="ab" data-cm="${esc(p.id)}" aria-label="Commentaires">💬 ${cm.length}</button>${admin ? `<button class="g danger" data-del="${esc(p.id)}">🗑 Supprimer</button>` : ""}</div>
+    ${open ? `<div class="cms">${cm.map(v => `<div class="cm"><b>${esc(v.author)}</b> <span class="mute">· ${esc(v.team)} · ${ago(v.ts)}</span>${admin ? ` <button class="g danger" data-dcm="${esc(p.id)}" data-id="${esc(v.id)}">×</button>` : ""}<div>${esc(v.text)}</div></div>`).join("")}
       <div class="row"><input id="ci-${esc(p.id)}" maxlength="200" placeholder="Écrire un commentaire…" style="margin:0"><button class="p" data-csend="${esc(p.id)}">Envoyer</button></div></div>` : ""}</div>`;
 }
 function vFeed(){
@@ -260,7 +264,8 @@ function vFeed(){
        <p>${!curW && autoIdx() < 0 ? "Les défis démarrent le " + sdText() + "." : "Les défis seront dévoilés par les organisateurs."} Reste connecté !</p></div>`;
   const list = posts.length ? posts.map(postCard).join("")
     : `<div class="card" style="text-align:center"><h3>Rien pour l'instant</h3><p class="mute">Sois le premier département au classement : appuie sur +.</p></div>`;
-  return hero + `<div class="row sp" style="margin:6px 4px 10px"><h2>Le feed</h2><span class="mute">${posts.length} post${posts.length>1?"s":""}</span></div>` + list;
+  const orga = admin ? `<div class="note" style="margin-top:0">🛡️ Mode organisateur : tu peux supprimer les posts et les commentaires (bouton rouge). <button class="g" data-adx>Quitter</button></div>` : "";
+  return orga + hero + `<div class="row sp" style="margin:6px 4px 10px"><h2>Le feed</h2><span class="mute">${posts.length} post${posts.length>1?"s":""}</span></div>` + list;
 }
 function vRank(){
   const s = scores(), max = Math.max(1, s[0]?.p), H = [150, 118, 96];
@@ -294,7 +299,7 @@ function vMe(){
     ${pinRequired ? `<label>PIN du département</label><input id="mtp" type="password" inputmode="numeric" autocomplete="off" placeholder="Code PIN du département">` : me.verifiedTeam ? `<p class="mute">Département vérifié : ${esc(me.verifiedTeam)}</p>` : ""}
     <button class="p" id="sv">Enregistrer</button></div>
     ${me.name?`<div class="card"><b>${mine.length} défi${mine.length>1?"s":""} validé${mine.length>1?"s":""}</b> · ${mine.reduce((s,p)=>s+pts(p),0)} pts</div>`:""}
-    <div class="card"><label>Mode organisateur</label>${admin?`<p class="mute">Activé : tu peux supprimer des posts et des commentaires depuis le feed.</p><label>Semaine en cours</label><select id="wcur"><option value="" ${!curW ? "selected" : ""}>Automatique (selon la date de départ)</option><option value="none" ${curW === "none" ? "selected" : ""}>Pas encore commencé</option>${CONFIG.weeks.map(w => `<option ${curW === w ? "selected" : ""}>${w}</option>`).join("")}</select><p class="mute">Automatique : chaque semaine s'ouvre toute seule, 7 jours après la précédente, à partir du ${sdText()}. Choisis une semaine pour forcer la semaine en cours. Tu peux aussi masquer ou afficher chaque semaine dans l'onglet Défis.</p>`:`<input id="pin" type="password" placeholder="PIN"><button class="g" id="ad">Activer</button>`}</div>`;
+    <div class="card"><label>Mode organisateur</label>${admin?`<p class="mute">Activé : tu peux supprimer des posts et des commentaires depuis le feed.</p><label>Semaine en cours</label><select id="wcur"><option value="" ${!curW ? "selected" : ""}>Automatique (selon la date de départ)</option><option value="none" ${curW === "none" ? "selected" : ""}>Pas encore commencé</option>${CONFIG.weeks.map(w => `<option ${curW === w ? "selected" : ""}>${w}</option>`).join("")}</select><p class="mute">Automatique : chaque semaine s'ouvre toute seule, 7 jours après la précédente, à partir du ${sdText()}. Choisis une semaine pour forcer la semaine en cours. Tu peux aussi masquer ou afficher chaque semaine dans l'onglet Défis.</p><button class="g" data-adx>Quitter le mode organisateur</button>`:`<input id="pin" type="password" placeholder="PIN"><button class="g" id="ad">Activer</button>`}</div>`;
 }
 let pend = false;
 function render(force){
@@ -303,7 +308,7 @@ function render(force){
   pend = false;
   $("#app").innerHTML = ({feed:vFeed,rank:vRank,chal:vChal,me:vMe})[tab]();
   document.querySelectorAll("nav [data-t]").forEach(b => b.classList.toggle("on", b.dataset.t === tab));
-  $("#status").innerHTML = `<span class="dot ${Store.live?"live":""}"></span>${Store.live?"Temps réel":"Mode démo"}`;
+  $("#status").innerHTML = `<span class="dot ${Store.live?"live":""}"></span>${Store.live?"Temps réel":"Mode démo"}${admin ? `<button class="orga" data-t="me" title="Mode organisateur actif">ORGA</button>` : ""}`;
 }
 document.addEventListener("focusout", () => { if (pend) setTimeout(() => { if (pend) render(); }, 80); });
 
@@ -319,11 +324,12 @@ document.addEventListener("keydown", e => {
 document.addEventListener("click", e => {
   const wk = e.target.closest("[data-w]"); if (wk) { wsel = wk.dataset.w; render(true); }
   if (e.target.id === "help") showTour();
+  if (e.target.closest("[data-adx]")) { admin = false; render(true); }
   const go = e.target.closest("[data-go]"); if (go) { tab = go.dataset.go; wsel = effCur() || wsel; render(true); scrollTo(0, 0); }
   if (e.target.closest("[data-wt]")) Store.setW(wsel, !wkVisible(wsel));
   if (e.target.closest("[data-wauto]")) Store.setW(wsel, null);
   const t = e.target.closest("[data-t]"); if (t) { tab = t.dataset.t; render(true); scrollTo(0,0); }
-  const d = e.target.closest("[data-del]"); if (d && confirm("Supprimer ce post ?")) Store.del(d.dataset.del);
+  const d = e.target.closest("[data-del]"); if (d && admin) { const q = posts.find(x => x.id === d.dataset.del); if (confirm("Supprimer ce post" + (q ? " de " + q.member + " (" + q.team + ")" : "") + " ? Ses points, likes et commentaires seront supprimés.")) Store.del(d.dataset.del); }
   const lk = e.target.closest("[data-like]"); if (lk) { if (!verified()) return needId(); const pid = lk.dataset.like; Store.setLike(pid, uKey(), !(likes[pid] || {})[uKey()]); }
   const cmb = e.target.closest("[data-cm]"); if (cmb) { const pid = cmb.dataset.cm; openCm.has(pid) ? openCm.delete(pid) : openCm.add(pid); render(true); }
   const cs = e.target.closest("[data-csend]"); if (cs) {
@@ -366,6 +372,7 @@ function openForm(){
     const member = $("#fn").value.trim(), team = me.team, cid = $("#fc").value;
     if (!member) return alert("Indique ton prénom.");
     if (!verified()) return alert("Ton département doit être vérifié dans Mon profil.");
+    if (!postable(ch(cid))) return alert("Ce défi n'est pas (ou plus) ouvert : il ne peut pas être posté pour le moment.");
     if (!ch(cid).rep && posts.some(p => p.member.toLowerCase() === member.toLowerCase() && p.team === team && p.cid === cid)) return alert("Tu as déjà validé ce défi.");
     await Store.add({ member, team, cid, qty: +$("#fqn").value||1, note: $("#fo").value.trim().slice(0,300), link: $("#fl").value.trim(), ts: Date.now() });
     me = { ...me, name: member }; saveMe(); dlg.close(); tab = "feed"; render(true);

@@ -115,9 +115,9 @@ const TEAM_COLORS = ["#008A5E","#0A5C1A","#222222","#2FA37A","#4C9A2A","#1E6F5C"
 const c = (id,sdg,lvl,t,o={}) => ({id,sdg,lvl,t,rep:!!o.rep,unit:o.unit||"",pts:o.pts ?? PTS[lvl],w:o.w});
 const CONFIG = {
   start: "2027-02-01",                 // date de lancement
-  onlyCurrentWeek: false,              // true = on ne peut poster que les défis de la semaine en cours (false = aussi les semaines déjà ouvertes)
+  onlyCurrentWeek: true,              // true = on ne peut poster que les défis de la semaine en cours (false = aussi les semaines déjà ouvertes)
   adminPin: "1234",                    // PIN pour supprimer des posts (à changer !)
-  weeks: ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11"],     // chaque semaine s'ouvre 7 jours après la précédente, à partir de "start"
+  weeks: ["S2","S4","S6","S8","S10","S12"],     // chaque semaine s'ouvre 14 jours après la précédente, à partir de "start"
   /* Semaine par ODD (à adapter !). Pour un défi précis, ajoute w:"S2" dans sa ligne. */
   weekOfOdd: {1:"S1",2:"S1",3:"S1",4:"S1",7:"S2",8:"S2",10:"S2",11:"S2",12:"S3",13:"S3",14:"S3",15:"S3",16:"S4",17:"S4"},
   teams: ["CxO", "HR", "CU", "SSU", "STU", "QU", "CommU"],
@@ -126,36 +126,45 @@ const CONFIG = {
   },
   /* Chaque semaine : 3 faciles (5 pts), 3 moyens (10 pts), 3 difficiles (15 pts), tous faisables en une semaine */
   challenges: [
-    // ---- S1 : ODD 1, 2, 3, 4 ----
-    c("s1e1",3,"easy","Bouge : 10 000 pas ou 30 min d'activité physique dans la journée (idéalement avec Expand, canal #sport)"),
-    c("s1e2",3,"easy","Gratitude : note 3 choses positives chaque jour pendant la semaine"),
-    c("s1e3",2,"easy","Courses de saison : fais tes courses chez färm ou dans un magasin durable, avec des produits de saison"),
-    c("s1m1",1,"medium","Grand tri : donne des vêtements ou des objets inutilisés à une association"),
-    c("s1m2",3,"medium","Cuisine maison : prépare tes repas toi-même pendant la semaine, en privilégiant des aliments sains"),
-    c("s1m3",4,"medium","Coworking ou monitorat : organise une demi-journée pour vous entraider (inscription via l'Excel)"),
-    c("s1h1",2,"hard","Repas solidaire : prépare un repas maison et donne-le à une personne sans-abri"),
-    c("s1h2",3,"hard","Donne ton sang avant la fin de la semaine"),
-    c("s1h3",4,"hard","Table de discussion : organise un débat sur un sujet de ton choix"),
-    // ---- S2 : ODD 7, 8, 10, 11 ----
-    c("s2e1",7,"easy","Tri numérique : fais le ménage dans tes photos, mails, apps et spams"),
-    c("s2e2",7,"easy","Trajet doux : un trajet en bus, train, vélo ou roller au lieu de la voiture",{rep:true}),
-    c("s2e3",8,"easy","Networking : échange avec 3 nouvelles personnes"),
-    c("s2m1",7,"medium","Défi énergie : chargeurs débranchés, lumières éteintes, moins d'1 h de téléphone par jour"),
-    c("s2m2",8,"medium","Achats éthiques : +1 pt par 2 € dépensés dans un magasin local, durable ou éthique",{rep:true,unit:"2 €",pts:1}),
-    c("s2m3",10,"medium","Ouverture : demande son avis à quelqu'un de différent et écoute sans contredire (ou défends une personne en situation de minorité)"),
-    c("s2h1",10,"hard","Participe à un event KAP solidaire ou inclusif, à un atelier de la Maison du DD ou à une conférence JCL"),
-    c("s2h2",11,"hard","Zéro voiture pendant 1 semaine"),
-    c("s2h3",11,"hard","Rends service : propose un covoiturage ou aide une personne à mobilité réduite à se déplacer"),
-    // ---- S3 : ODD 12, 13, 14, 15 ----
-    c("s3e1",13,"easy","Passe ton navigateur sur Ecosia et écris 2 éco-résolutions pour l'année"),
-    c("s3e2",12,"easy","Explique le développement durable à un pote (mini speech)"),
-    c("s3e3",12,"easy","Évite les fastfoods : mange au RestU ou prépare ton lunch"),
-    c("s3m1",12,"medium","Répare quelque chose au lieu de le remplacer"),
-    c("s3m2",12,"medium","Une journée sans plastique : lunch en contenant réutilisable, gourde, rien d'emballé dans du plastique"),
-    c("s3m3",14,"medium","Évite les produits de la mer pendant la semaine"),
-    c("s3h1",13,"hard","Semaine végé : que des repas végétariens, de préférence bio, locaux ou en vrac"),
-    c("s3h2",12,"hard","Zéro déchet : max une poubelle de 30 L dans le kot sur la semaine, sans gaspillage alimentaire"),
-    c("s3h3",15,"hard","Ramassage de déchets autour du lac ou du parc de la Source (photo à l'appui)")
+    // ---- S2 : ODD 1, 2 ----
+    c("s2e3",2,"easy","Courses de saison : fais tes courses chez färm ou dans un magasin durable, avec des produits de saison"),
+    c("s2m1",1,"medium","Grand tri : donne des vêtements ou des objets inutilisés à une association"),
+    c("s2h1",2,"hard","Repas solidaire : prépare un repas maison et donne-le à une personne sans-abri"),
+    
+    // ---- S4 : ODD 3 & 4 ----
+    c("s4e1",3,"easy","Bouge : 10 000 pas ou 30 min d'activité physique dans la journée (idéalement avec Expand, canal #sport)"),
+    c("s4e2",3,"easy","Gratitude : note 3 choses positives chaque jour pendant la semaine"),
+    c("s4m2",3,"medium","Cuisine maison : prépare tes repas toi-même pendant la semaine, en privilégiant des aliments sains"),
+    c("s4h2",3,"hard","Donne ton sang avant la fin de la semaine"),
+    c("s4m3",4,"medium","Coworking ou monitorat : organise une demi-journée pour vous entraider (inscription via l'Excel)"),
+    c("s4h3",4,"hard","Table de discussion : organise un débat sur un sujet de ton choix"),
+    
+    // ---- S6 : 7 & 8  ----
+    c("s6e1",7,"easy","Tri numérique : fais le ménage dans tes photos, mails, apps et spams"),
+    c("s6e2",7,"easy","Trajet doux : un trajet en bus, train, vélo ou roller au lieu de la voiture",{rep:true}),
+    c("s6e3",8,"easy","Networking : échange avec 3 nouvelles personnes"),
+    c("s6m1",7,"medium","Défi énergie : chargeurs débranchés, lumières éteintes, moins d'1 h de téléphone par jour"),
+    c("s6m2",8,"medium","Achats éthiques : +1 pt par 2 € dépensés dans un magasin local, durable ou éthique",{rep:true,unit:"2 €",pts:1}),
+    
+    // ---- S8 : ODD 10 & 11 ----
+    c("s8m3",10,"medium","Ouverture : demande son avis à quelqu'un de différent et écoute sans contredire (ou défends une personne en situation de minorité)"),
+    c("s8h1",10,"hard","Participe à un event KAP solidaire ou inclusif, à un atelier de la Maison du DD ou à une conférence JCL"),
+    c("s8h2",11,"hard","Zéro voiture pendant 1 semaine"),
+    c("s8h3",11,"hard","Rends service : propose un covoiturage ou aide une personne à mobilité réduite à se déplacer"),
+    
+    // ---- S10 : ODD 12 & 13 ----
+    c("s10e1",13,"easy","Passe ton navigateur sur Ecosia et écris 2 éco-résolutions pour l'année"),
+    c("s10e2",12,"easy","Explique le développement durable à un pote (mini speech)"),
+    c("s10e3",12,"easy","Évite les fastfoods : mange au RestU ou prépare ton lunch"),
+    c("s10m1",12,"medium","Répare quelque chose au lieu de le remplacer"),
+    c("s10m2",12,"medium","Une journée sans plastique : lunch en contenant réutilisable, gourde, rien d'emballé dans du plastique"),
+    c("s10h1",13,"hard","Semaine végé : que des repas végétariens, de préférence bio, locaux ou en vrac"),
+    c("s10h2",12,"hard","Zéro déchet : max une poubelle de 30 L dans le kot sur la semaine, sans gaspillage alimentaire"),
+    
+    // ---- S12 : ODD 14 & 15 ----
+    c("s12m3",14,"medium","Évite les produits de la mer pendant la semaine"),
+    c("s12h3",15,"hard","Ramassage de déchets autour du lac ou du parc de la Source (photo à l'appui)")
+
   ],
   /* Mode temps réel : colle ici ta config Firebase (Realtime Database).
      Laisse null pour tester en mode démo (stockage local, non partagé). */
@@ -386,7 +395,7 @@ function showTour(){
   const steps = [
     {t:"Bienvenue à la SDGs Cup 🌱", b:"<p>7 départements, 1 gagnant. Relève des défis liés aux ODD, poste ta preuve et fais gagner des points à ton département.</p><p>Petit tour rapide (30 secondes).</p>"},
     {sel:'[data-t="feed"]', view:"feed", t:"Le feed", b:"<p>Toutes les publications de tous les départements apparaissent ici, en direct. Tu peux liker ♥ et commenter chaque post.</p>"},
-    {sel:'[data-t="chal"]', view:"chal", t:"Les défis", b:"<p>Les défis sont organisés par semaine (S1, S2, S3…), puis par ODD. Choisis la semaine avec les boutons en haut de la page.</p><p>Chaque défi indique les points qu'il rapporte.</p>"},
+    {sel:'[data-t="chal"]', view:"chal", t:"Les défis", b:"<p>Toutes les deux semaines il y a deux défis à réaliser en liens avec les ODDs présentés la semaine précédente. Choisis la semaine avec les boutons en haut de la page.</p><p>Chaque défi indique les points qu'il rapporte.</p>"},
     {sel:'[data-t="me"]', view:"me", t:"Ton département", b:"<p>Dans <b>Mon profil</b>, entre ton prénom, choisis ton département et tape son PIN (demande-le à ton responsable de département).</p><p>Tu ne le fais qu'une fois : le site s'en souvient sur cet appareil.</p>"},
     {sel:"#add", t:"Déclarer un défi", b:"<p>Défi relevé ? Appuie sur le <b>+</b>, choisis le défi, ajoute un commentaire et un lien vers ta preuve (photo, Drive, Insta…).</p><p>Chaque membre poste sa propre preuve : chaque post rapporte des points à ton département.</p>"},
     {sel:'[data-t="rank"]', view:"rank", t:"Le classement", b:"<p>Suis en direct le classement des départements. Les organisateurs vérifient les posts et suppriment les fraudes.</p>"},
